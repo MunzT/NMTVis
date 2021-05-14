@@ -1,0 +1,7 @@
+.sentence:hover {
+    background: #ffd891;
+}
+
+.active-sentence {
+    background: #ffd891;
+}

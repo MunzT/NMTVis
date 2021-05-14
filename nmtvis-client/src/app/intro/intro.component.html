@@ -1,0 +1,170 @@
+<div style="width: 70%;margin: auto;text-align: left;margin-bottom: 100px;">
+    <div>
+        <h1>Introduction</h1>
+        <p>
+            NMTVis is <b>visual analytics</b> system using an interactive machine-translation approach to support the translation of large documents.
+            The system takes an English (or German) document and translates it into German (or English), sentence by sentence.
+            Users can view the machine translations, and interactively correct them if necessary.
+            The system can improve its translations using these corrections.
+        </p>
+    </div>
+    <div>
+        <h2>Main Functions</h2>
+        <ul>
+            <li>Translate large, domain-specific documents (e.g., from computer science)</li>
+            <li>Find incorrect translations through metrics and filtering</li>
+            <li>Interactively correct translations</li>
+            <li>Adapt the system and improve translations using users' corrections</li>
+        </ul>
+    </div>
+    <div>
+        <h1>Main View</h1>
+        <figure style="margin-left: 0px;">
+            <img src="assets/metricsview-intro.png" width="100%">
+            <figcaption>Document View: Metrics View (top left), Keyphrase View (top right) and list of sentences (bottom)</figcaption>
+        </figure>
+
+        <h2>Metric View (top left)</h2>
+        <ul>
+            <li>This view c be used to filter and select sentences from the document based on metrics such
+                as sentence length, confidence, ...
+            </li>
+            <li>Each metric is represented by an <b>axis</b> and each sentence is a <b>line</b> that intersects each
+                axis at the value of that sentence for that metric.
+            </li>
+            <li>Sentences can be selected by hovering over a line or in the list of sentences below, and a highlighted
+              sentence will appear as an orange line.
+            </li>
+            <li>Green lines represent currently visible sentences in the Document View, while gray lines represent
+                sentences that are currently filtered out.
+            </li>
+            <li>Brushing (clicking and draggin up/down) an axis with the mouse creates a filter for the
+                respective metric. Remove the filter by clicking anywhere else on the axis.
+            </li>
+            <li>This filter can be dragged up and down, and multiple filters can be set.</li>
+            <li>Sentences can be <b>sorted</b> based on metrics, by clicking on the sort icon below each axis.</li>
+            <li>You can drag and drop axes to switch the order of metrics.</li>
+        </ul>
+        <p>These are the metrics used in the Metrics View:</p>
+        <ul>
+            <li><b>Document Order:</b> The index of a sentence in the document, e.g. the first sentence has index 0.</li>
+            <li><b>Confidence:</b> The confidence of the system regarding a translation. High values suggest a good
+                translation, low values suggest errors.
+            </li>
+            <li><b>Coverage Penalty:</b> This metric indicates if words from the source sentence were not translated. A
+                high penalty may indicate translation errors.
+            </li>
+            <li><b>Sentence Length:</b> The number of words in the <b>source sentence</b>. This is useful as long
+                sentences may contain errors.
+            </li>
+            <li><b>Keyphrases:</b> The number of keyphrases, i.e. domain-specific words, in a sentence. This metric is
+                important to ensure such words are translated correctly.
+            </li>
+            <li><b>Sentence Similarity:</b> This metric can be activated for a specific sentence by clicking the list
+                icon on the right side of a sentence in the Document View.
+                It indicates how similar a sentence is in relation to the reference sentence.
+                You could add this metric for a sentence that was mistranslated and find similar sentences
+                that might contain similar errors.
+            </li>
+        </ul>
+    </div>
+    <div>
+        <h2>Keyphrase View (top right)</h2>
+        <ul>
+            <li>This view shows a list of keyphrases, which are domain-specific words, sorted based on
+                their frequency.
+            </li>
+            <li>The number next to each keyphrase indicates its frequency and importance in the current document.
+            </li>
+            <li>By activating a keyphrase (clicking on the checkbox next to it), only sentences containing the keyphrase
+                are displayed in the Document View.</li>
+            <li>All active keyphrases are highlighted in the source sentence on the left, as well as their translation
+                on the right.
+            </li>
+            <li>If a keyphrase was mistranslated by the system, this should be visible by looking at highlighted
+                words.
+            </li>
+            <li>New keyphrases can be added by entering them in the text field below the list of keyphrases.</li>
+        </ul>
+    </div>
+    <div>
+        <h2>Document View</h2>
+        <ul>
+            <li>This view contains a list of all source sentences and their translations for the current filtering.</li>
+            <li>Each sentence can be marked as correct or flagged for correction.</li>
+            <li>Histograms on the fight side show an overview of the metrics previously introduced.</li>
+            <li>User changes and changes by the model are highlighted.</li>
+            <li>A sentence can be selected for further exploration and correction by clicking on it.</li>
+        </ul>
+    </div>
+    <div>
+        <h1>Detailed View</h1>
+        <figure style="margin-left: 0px;">
+            <img src="assets/detailedview-intro.png" width="100%">
+            <figcaption>Sentence View (top), Attention View (middle) and Beam Search View (bottom)</figcaption>
+        </figure>
+
+        <h2>Sentence View</h2>
+        <ul>
+            <li>This view is text-based and allows manual modification of the translation.</li>
+        </ul>
+
+        <h2>Beam Search View</h2>
+        <ul>
+            <li>The Beam Search View shows you all translations generated by the system as a tree.</li>
+            <li>The <b>number</b> of translations shown (beam size) can be changed at the bottom.</li>
+            <li>Each <b>circle</b> represents a word, and <b>links</b> between words connect the words of a translation.
+            </li>
+            <li>The <b>color</b> of a circle represents the probability of system assigned to the related word.</li>
+            <li><b>Red circles</b> signify likely words, while <b>light circles</b> signify unlikely words.</li>
+            <li>An <b>orange ring</b> around a circle highlights the currently selected word.</li>
+            <li>Following the tree from the <b>SOS</b> (Start of Sentence) circle to an <b>EOS</b> (End of Sentence)
+              circle, a complete translation is created.
+            </li>
+            <li><b>Yellow links</b> represent the current best translation, which you can change by clicking on any
+                other EOS circle.
+            </li>
+        </ul>
+        <h3>Navigation and Interaction</h3>
+        <figure style="margin-left: 0px;">
+            <img src="assets/beam-interaction.png" width="50%">
+            <figcaption><b>Left:</b> Navigation using arrow keys. <b>Right:</b> Custom correction ("experiments") or
+                alternatives
+            </figcaption>
+        </figure>
+        <ul>
+            <li>By moving from the <b>SOS</b> to a <b>EOS</b> circle, you complete a translation.</li>
+            <li>Hover over a node to select a (partial) translation.</li>
+            <li>You can move through the translations using <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> keys as
+                seen in the figure.
+            </li>
+            <li>Press <kbd>ENTER</kbd> or <b>click</b> to show alternative words to continue a translation.</li>
+            <li>Type any <kbd>key</kbd> to create a custom correction, if you do not like any alternatives shown.</li>
+            <li>Press <kbd>BACKSPACE</kbd> to remove the last character from your custom correction or move backwards.
+            </li>
+            <li>You can also use <kbd>TAB</kbd> to move forwards through a translation.</li>
+        </ul>
+    </div>
+
+    <h2>Attention View</h2>
+    <div>
+        <ul>
+            <li>The <b>Attention View</b> visualizes how words in the source sentence relate to words in the current
+                translation and vice versa.
+            </li>
+            <li>Lines with varying thickness connect source words with translation words.</li>
+            <li>The <b>thicker</b> the line, the more <b>important</b> the attached source word was for translating the word in the
+                translation.
+            </li>
+            <li>If there is <b>no line</b> from a source word to any word in the translation, this
+                might suggest that the word was not properly translated.
+            </li>
+            <li>During interaction with the Beam Search View, the Attention View highlights the relevant source words
+                to aid in correcting a translation.
+            </li>
+            <li>You can also <b>hover</b> over words in the source sentence and translation, which highlights all related words
+                in the respective other language.
+            </li>
+        </ul>
+    </div>
+</div>

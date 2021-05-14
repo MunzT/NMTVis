@@ -1,0 +1,73 @@
+<div class="sentence" style="font-size: 14px; text-align: justify; cursor: pointer;display: flex;"
+     (click)="openSentenceView(sentence)"
+     [ngClass]="{'active-sentence': selectedSentence !== null && selectedSentence !== undefined && selectedSentence.id == sentence.id}">
+
+    <span style="padding-top: 5px; width: 35px; padding-right: 5px;vertical-align: top; color: gray">
+        #{{ sentence.score["order_id"] }}
+    </span>
+    <span style="padding-top: 5px; width: 50%;display:inline-block;vertical-align: top;">
+        <a style="text-decoration: none; color: black; vertical-align: middle;"
+           [id]="'sentence-' + sentence.id"
+           [routerLink]="['/document', selectedDocument.id, 'sentence', sentence.id]">
+            <span *ngFor="let word of textPipe.transform(sentence.source).split(' ')"
+                  class="source-word"
+                  [style.background-color]="isHighlighted(word) ? '#ffa50091' : none">
+                {{word}}
+            </span>
+
+        </a>
+    </span>
+    <span style="padding-top: 5px; width: 50%;display: inline-block; vertical-align: top;padding-left: 10px;">
+        <a style="text-decoration: none; color: black; vertical-align: middle;"
+           [id]="'translation-sentence-' + sentence.id"
+           [routerLink]="['/document', selectedDocument.id, 'sentence', sentence.id]">
+
+            <div *ngIf="sentence.diff.length == 0">
+                <span class="target-word"
+                      *ngFor="let word of textPipe.transform(sentence.translation, true).split(' ');let j = index;"
+                      ya
+                      [style.background-color]="isHighlightedTarget(sentence, word, j) ? '#ffa50091' : none">
+                    {{word}}
+                </span>
+            </div>
+            <div innerHTML="{{ sentence.diff }}"></div>
+        </a>
+    </span>
+
+    <button style="" type="button"
+            (click)="onSentenceClick(sentence, $event)"
+            mat-icon-button
+            title="Mark translation as corrected">
+        <mat-icon [ngStyle]="{'color': sentence.corrected ? '#20bf6b' : 'lightgray'}">check
+        </mat-icon>
+    </button>
+    <button style="" type="button"
+            (click)="onSentenceFlag(sentence, $event)"
+            mat-icon-button
+            title="Flag translation for correction">
+        <mat-icon [ngStyle]="{'color': sentence.flagged ? '#eb3b5a' : 'lightgray'}">flag
+        </mat-icon>
+
+    </button>
+    <a style="" type="button"
+       [routerLink]="['/document', selectedDocument.id, 'sentence', sentence.id]"
+       mat-icon-button
+       title="Edit translation">
+        <mat-icon style="color: lightgray">edit
+        </mat-icon>
+
+    </a>
+
+    <button style="" type="button"
+            (click)="onFilter(sentence, $event)"
+            mat-icon-button
+            title="Sort sentences according to similarity to this sentence and add corresponding metric.">
+        <mat-icon [ngStyle]="{'color': selectedDocument.showSimilarityMetric === sentence.id ? 'tela' : 'lightgray'}">line_weight
+        </mat-icon>
+    </button>
+
+    <svg id="barchart-vis-{{ sentence.id }}" style="padding-left: 10px; padding-right: 10px; width:40px; height:40px; padding-top: 0px;">
+    </svg>
+
+</div>
+<mat-divider [inset]="true"></mat-divider>

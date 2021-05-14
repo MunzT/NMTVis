@@ -1,0 +1,189 @@
+<mat-sidenav-container class="" style="min-height: 800px;">
+    <mat-sidenav mode="side" opened style="min-width: 200px;">
+        <mat-list>
+            <form class="translation-form" style="padding-bottom: 10px; padding-left: 5px; padding-right: 5px;">
+                <button style="width: 100%;" type="button" (click)="uploadClick()" mat-raised-button
+                        color="primary">Upload
+                    Document
+                </button>
+            </form>
+            <mat-divider></mat-divider>
+            <div *ngFor="let document of documents;">
+                <mat-list-item [ngClass]="{'active-document': selectedDocument == document}" class="document-item"
+                               (click)="onClick(document)"> {{
+                    document.name }}
+                </mat-list-item>
+                <mat-divider></mat-divider>
+            </div>
+        </mat-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="entire-thing" *ngIf="selectedDocument">
+
+            <mat-card class="example-card" style="padding-top: 0px;">
+
+                <div *ngIf="showMetrics">
+                    <app-sentences-vis *ngFor="let metric of metrics" [sentences]="selectedDocument.sentences"
+                                       [(selectedSentence)]="selectedSentence"
+                                       [metric]="metric.name"
+                                       [color]="metric.color"
+                                       [shortname]="metric.shortname"
+                                       (onSort)="sortSentences($event[0], $event[1])">
+
+                    </app-sentences-vis>
+                </div>
+                <div *ngIf="true" id="keyphrase-view" style="height:200px; display: flex">
+                    <div *ngIf="true" style="width: 100%">
+                        <app-parallel-coordinates
+                                (onSortMetric)="sortSentences($event[0], $event[1])"
+                                [sentences]="allSentences"
+                                [topics]="topics"
+                                [hoverTopic]="hoverTopic"
+                                (onSelectionChange)="onBrushSelectionChange($event)"
+                                [(selectedSentence)]="selectedSentence"
+                                (onSentenceSelection)="scrollToSentence($event)"
+                                [defaultSortMetric]="defaultSortMetric"
+                                [defaultSortAscending]="defaultSortAscending"
+                                [defaultBrush]="defaultBrush"
+                                [showSimilarityMetric]="showSimilarityMetric"
+                                (onBrushExtentChange)="onBrushExtentChange($event)">
+
+                        </app-parallel-coordinates>
+                    </div>
+                    <div style="float:left;display: inline-block;vertical-align: top;width: 220px; height: 100%">
+                        <mat-card class="example-card" style="padding: 10px;height: 100%;">
+                            <mat-card-header>
+                                Keyphrase View
+                            </mat-card-header>
+                            <mat-card-content style="height: 80%;">
+                                <div style="overflow-y: scroll;text-align: start;height: 85%;">
+                                    <div *ngFor="let topic of topics">
+                                        <div>
+                                            <div class="topic" style="padding:2px;" (mouseenter)="hoverTopic=topic"
+                                                 (mouseleave)="hoverTopic = null">
+                                                <mat-checkbox style="display:inline" [name]="topic.name"
+                                                              [disabled]="topic.occurrences == 0"
+                                                              [(ngModel)]="topic.active"
+                                                              (change)="onActiveTopicChange()">
+                                                    {{topic.name}} <span
+                                                        style="color: #a8a8a8">{{topic.occurrences}}</span>
+                                                </mat-checkbox>
+                                            </div>
+                                            <mat-divider [inset]="true"></mat-divider>
+                                        </div>
+                                    </div>
+                                </div>
+                                <mat-form-field style="width:100%;">
+                                    <input (keyup.enter)="addTopic(newKeyphrase)" [(ngModel)]="newKeyphrase" matInput
+                                           type="text"
+                                           placeholder="New Keyphrase">
+                                </mat-form-field>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="margin-top:35px;width:45%; display: inline-block;margin-left: 5px;margin-bottom: 0px">
+                        Source</h3>
+                    <h3 style="margin-top:35px;width:45%; display: inline-block;margin-bottom: 0px;">Translation</h3>
+                </div>
+                <mat-card-content id="document-scroll"
+                                  style="text-align: left;overflow-y: scroll; height: 800px;">
+
+                    <mat-progress-spinner *ngIf="loading" style="margin:auto;width:10px;height:10px;"
+                                          class="example-margin"
+                                          color="primary"
+                                          [diameter]="40"
+                                          mode="indeterminate">
+                    </mat-progress-spinner>
+
+                    <div style="text-align: center;margin-top: 50px;color: gray;"
+                         *ngIf="!loading && selectedDocument.sentences && selectedDocument.sentences.length === 0">
+                        No sentences found for current filters
+                    </div>
+
+                    <div *ngFor="let sentence of selectedDocument.sentences; let i = index;"
+                         style=""
+                         class=""
+                         (mouseenter)="selectedSentence = sentence;">
+
+                        <app-sentence-list-item
+                                *ngIf="isVisible(sentence)"
+                                [sentence]="sentence"
+                                [selectedDocument]="selectedDocument"
+                                [topics]="topics"
+                                [selectedSentence]="selectedSentence"
+                                (onSentenceSimilarityMetricChanged)="onSentenceSimilarityMetricChanged($event)">
+
+                        </app-sentence-list-item>
+                    </div>
+                </mat-card-content>
+
+                <div style="">
+                    <span *ngIf="selectedDocument && selectedDocument.sentences" style="display: inline-block; float:left;">
+                        Corrected <span class="number-display">{{ correctedSentences }}</span> of <span
+                            class="number-display">{{ selectedDocument.sentences.length}}</span>
+                        ({{ (correctedSentences / selectedDocument.sentences.length) | percent}})
+                    </span>
+
+                    <form class="example-form" style="display: inline;margin-left: 20px;">
+                        <mat-checkbox (change)="onShowCorrected($event[0])" name="showCorrected"
+                                      [(ngModel)]="showCorrected">Hide corrected
+                        </mat-checkbox>
+                    </form>
+
+                    <form class="example-form" style="display: inline;margin-left: 20px;">
+                        <mat-checkbox (change)="onShowFlagged($event[0])" name="showFlagged"
+                                      [(ngModel)]="showFlagged">Show flagged
+                        </mat-checkbox>
+                    </form>
+
+                    <button type="button" style="float: right;" (click)="onRetrainClick()" mat-raised-button
+                            title="Retrain model using corrected sentences."
+                            color="primary">{{ retrainText }}
+                        <mat-icon style="font-size:16px; vertical-align: sub">repeat
+                        </mat-icon>
+                    </button>
+                    <button type="button" style="float: right;margin-right: 10px;" (click)="onRetranslateClick()"
+                            mat-raised-button
+                            title="Retranslate sentences which are not accapted."
+                            color="primary">{{ retranslateText }}
+
+                        <mat-icon style="font-size:16px; vertical-align: sub">repeat
+                        </mat-icon>
+                    </button>
+                    <button type="button" style="float: right;margin-right: 10px;" (click)="onSaveTranslationClick()"
+                              mat-raised-button
+                              title="Save translation to file."
+                              color="primary">{{ saveTranslationText }}
+
+                        <mat-icon style="font-size:17px; vertical-align: sub">repeat
+                        </mat-icon>
+                    </button>
+
+                    <button type="button" id="removeSimilarityButton" style="float: right;margin-right: 10px; visibility: collapse;" (click)="onRemoveSimilarityMetricClick()"
+                              mat-raised-button
+                              title="Reset similarity metric (from metrics view and sentence ordering)."
+                              color="primary">
+                        Remove Similarity Metric
+                        <mat-icon style="font-size:17px; vertical-align: sub">replay
+                        </mat-icon>
+                    </button>
+
+                    <span *ngIf="numChanges > 0">
+                        {{numChanges}} changes
+                    </span>
+                </div>
+
+                <mat-progress-bar style="padding-top:5px;" *ngIf="retranslating || retraining"
+                                  class="example-margin"
+                                  [color]="'primary'"
+                                  [mode]="'indeterminate'">
+                </mat-progress-bar>
+
+
+            </mat-card>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

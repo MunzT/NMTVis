@@ -1,0 +1,24 @@
+.document-item:hover {
+    background-color: lightgray;
+}
+
+.document-item {
+    cursor: pointer;
+}
+
+.active-document {
+    background: #eee;
+}
+
+.ad-left {
+    float: left;
+}
+
+.ad-right {
+    float: right;
+    margin-left: 10px;
+}
+
+.topic:hover {
+    background-color: #ddd;
+}

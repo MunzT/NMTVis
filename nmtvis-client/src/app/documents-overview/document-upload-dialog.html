@@ -1,0 +1,21 @@
+<div style="max-width: 500px;">
+    <input hidden #docUploadInput id="singleFile" type="file" [fileUploadInputFor]="fileUploadQueue"/>
+    <mat-form-field style="width: 100%;">
+        <input matInput [(ngModel)]="documentName" type="text"
+               name="newDocumentName"
+               placeholder="Document Name">
+    </mat-form-field>
+    <form class="translation-form" style="margin-bottom: 10px;">
+        <button style="width: 100%;" type="button" (click)="docUploadInput.click()" mat-raised-button
+                color="primary">Select Document
+        </button>
+    </form>
+    <mat-file-upload-queue #fileUploadQueue
+                           [fileAlias]="'file'"
+                           [httpUrl]="uri"
+                           [httpRequestHeaders]="{}">
+
+        <mat-file-upload [file]="file" [id]="i"
+                         *ngFor="let file of fileUploadQueue.files; let i = index"></mat-file-upload>
+    </mat-file-upload-queue>
+</div>

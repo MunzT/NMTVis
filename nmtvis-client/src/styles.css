@@ -1,0 +1,335 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+@font-face {
+   font-family: 'Open Sans Light';
+   src: URL('assets/Open_Sans/OpenSans-Light.ttf') format('truetype');
+}
+
+* {
+    font-family: 'Open Sans Light';
+    font-style: normal;
+    font-weight: 300;
+}
+
+figcaption {
+    font-weight: 100;
+}
+
+kbd {
+    padding: 0.1em 0.6em;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    -moz-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+    -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+    box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 0 0.1em;
+    text-shadow: 0 1px 0 #fff;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.number-display {
+    padding-left: 2px;
+    padding-right: 2px;
+    background: #e3e3e3;
+    font-weight: bold;
+}
+
+foreignObject {
+    text-align: left;
+}
+
+body {
+    margin: 0px;
+}
+
+.mat-input-element:disabled {
+    color: #393939 !important;
+}
+
+.mat-form-field-disabled .mat-form-field-underline {
+    background-position: 0;
+    background-color: #393939 !important;
+}
+
+del {
+    text-decoration: line-through;
+    background-color: #fbb;
+    color: #555;
+}
+
+ins {
+    text-decoration: none;
+    background-color: #d4fcbc;
+}
+
+#tree-vis {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.node circle {
+    fill: #fff;
+    stroke: #f6f6f6;
+    stroke-width: 3px;
+}
+
+.node text {
+    font-size: 15px;
+    font-weight: normal;
+    pointer-events: none
+}
+
+.focus-path text {
+    font-weight: bold;
+}
+
+.focus circle {
+    stroke: rgb(255, 204, 0);
+}
+
+.focus text {
+    font-weight: bold;
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+    stroke-dasharray: 7px;
+}
+
+.candidate-link {
+    fill: none;
+    stroke: #ccc;
+    stroke-dasharray: 4px;
+    stroke-width: 2px;
+}
+
+.bpe-link {
+    stroke-width: 2px;
+    stroke-dasharray: none;
+}
+
+.golden-link {
+    fill: none;
+    stroke: #fed330;
+    stroke-width: 3px;
+}
+
+.focus-link {
+    fill: none;
+    stroke-width: 4px;
+}
+
+circle:hover {
+    stroke: lightgray;
+}
+
+.example-full-width {
+    min-width: 500px;
+}
+
+.example-fill-remaining-space {
+    /* This fills the remaining space, by using flexbox.
+       Every toolbar row uses a flexbox row layout. */
+    flex: 1 1 auto;
+}
+
+.example-card {
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.example-container {
+    height: 1000px;
+}
+
+.attention-line {
+    fill: none;
+    stroke: lightgray;
+    opacity: 0.7;
+}
+
+.fade-out {
+    opacity: 0.2;
+}
+
+.attention-selected {
+    stroke: orange;
+    opacity: 1;
+}
+
+.source-word-box {
+    fill: #fed330;
+}
+
+.target-word-box {
+    fill: #40e8d1;
+}
+
+#translation-box {
+    font-size: 13px;
+}
+
+#translation-box text {
+    pointer-events: none;
+}
+
+.sentence-bar {
+    fill: orange;
+}
+
+.background-sentence-bar {
+    fill: #eeeeee;
+}
+
+.selected-sentence-bar {
+    stroke: #ff5900;
+    stroke-width: 3px;
+}
+
+mat-icon {
+    vertical-align: middle;
+}
+
+.sv_complete_btn {
+    float: none !important;
+}
+
+.background path {
+    fill: none;
+    stroke: #ddd;
+    shape-rendering: auto;
+}
+
+.foreground path {
+    fill: none;
+    stroke-width: 1.5px;
+    stroke: teal;
+    opacity: 0.3;
+}
+
+.brush .extent {
+    fill-opacity: .3;
+    stroke: #fff;
+    shape-rendering: auto;
+}
+
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #000;
+    shape-rendering: auto;
+}
+
+.axis text {
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+    cursor: move;
+}
+
+.selected-line  {
+    stroke: orange !important;
+    stroke-width: 2px !important;
+    opacity: 1 !important;
+}
+
+polygon {
+    fill: lightgray;
+    stroke: white;
+    stroke-width: 1px;
+    cursor: pointer
+}
+
+.selected-triangle {
+    fill: black;
+}
+
+polygon:hover {
+    stroke: black;
+}
+
+.axis:hover line,
+.axis:hover path {
+    stroke: #222;
+    stroke-width: 2px;
+}
+
+.axis:hover .title {
+    font-weight: bold;
+}
+
+.axis:hover .tick text {
+    opacity: 1;
+}
+
+.brush .extent {
+    fill-opacity: .3;
+    stroke: #fff;
+    stroke-width: 1px;
+}
+
+.axis .tick text {
+    fill: #222;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.axis:hover .tick text {
+    opacity: 1;
+    font-size: 12px;
+}
+
+.sort-icon {
+    pointer-events: bounding-box;
+}
+
+.sort-icon path {
+    fill: lightgray;
+    shape-rendering: auto;
+}
+
+.sort-icon:hover path {
+    fill: gray;
+    shape-rendering: auto;
+}
+
+.active-sort-icon path {
+    fill: orange;
+    shape-rendering: none;
+}
+
+.active-sort-icon:hover path {
+    fill: orange;
+    shape-rendering: none;
+}
+
+#keyphrase-view .mat-checkbox-inner-container {
+    height: 15px !important;
+    width: 15px !important;
+}
+
+#keyphrase-view .mat-checkbox-label {
+    font-size: 12px;
+}
+
+#parallel-coordinates-box text {
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

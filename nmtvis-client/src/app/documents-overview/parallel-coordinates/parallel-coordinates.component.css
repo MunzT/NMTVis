@@ -1,0 +1,28 @@
+.background path {
+    fill: none;
+    stroke: #ddd;
+    shape-rendering: auto;
+}
+
+.foreground path {
+    fill: none;
+    stroke: teal;
+}
+
+.brush .extent {
+    fill-opacity: .3;
+    stroke: #fff;
+    shape-rendering: auto;
+}
+
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #000;
+    shape-rendering: auto;
+}
+
+.axis text {
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+    cursor: move;
+}
