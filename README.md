@@ -1,5 +1,7 @@
-
 # NMTVis
+
+[![Identifier](https://img.shields.io/badge/doi-10.18419%2Fdarus--1849-d45815.svg)](https://doi.org/10.18419/darus-1849)
+
 ![NMTVis](application.png)
 
 NMTVis is a system that supports users in correcting translations generated with neural machine translation.
