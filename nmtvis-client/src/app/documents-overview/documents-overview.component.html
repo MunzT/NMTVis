@@ -89,7 +89,7 @@
                     <h3 style="margin-top:35px;width:45%; display: inline-block;margin-bottom: 0px;">Translation</h3>
                 </div>
                 <mat-card-content id="document-scroll"
-                                  style="text-align: left;overflow-y: scroll; height: 800px;">
+                                  style="text-align: left;overflow-y: scroll; height: 500px;">
 
                     <mat-progress-spinner *ngIf="loading" style="margin:auto;width:10px;height:10px;"
                                           class="example-margin"
@@ -129,7 +129,13 @@
 
                     <form class="example-form" style="display: inline;margin-left: 20px;">
                         <mat-checkbox (change)="onShowCorrected($event[0])" name="showCorrected"
-                                      [(ngModel)]="showCorrected">Hide corrected
+                                      [(ngModel)]="showCorrected">Show corrected
+                        </mat-checkbox>
+                    </form>
+
+                    <form class="example-form" style="display: inline;margin-left: 20px;">
+                        <mat-checkbox (change)="onHideCorrected($event[0])" name="hideCorrected"
+                                      [(ngModel)]="hideCorrected">Hide corrected
                         </mat-checkbox>
                     </form>
 

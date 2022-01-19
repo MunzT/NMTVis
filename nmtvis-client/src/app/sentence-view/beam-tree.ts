@@ -26,7 +26,7 @@ export class BeamTree {
     build() {
         var margin = {top: 50, right: 30, bottom: 50, left: 50},
             width = 1650 - margin.left - margin.right,
-            height = 590 - margin.top - margin.bottom;
+            height = 500 - margin.top - margin.bottom;
         this.height = height;
 
         // append the svg object to the body of the page
@@ -465,6 +465,7 @@ export class BeamTree {
             this.that.attention = this.getBeamAttention(d);
             this.that.translation = this.getRawTranslation(d);
             this.that.updateTranslation(this.that.sentence.join(" "), this.that.translation.join(" "));
+            this.that.updateAttentionMatrix(this.that.sentence.join(" "), this.that.translation.join(" "));
             return;
         }
 
@@ -748,6 +749,13 @@ export class BeamTree {
             this.that.attention = this.getBeamAttention(this.focusNode);
             this.that.translation = this.getRawTranslation(this.focusNode);
             this.that.updateTranslation(this.that.sentence.join(" "), this.that.translation.join(" "));
+
+            var tempNode = this.lastNodeOfGoldenHypothesis(this.focusNode);
+            if (tempNode === this.focusNode) {
+                tempNode = this.lastNodeOfBestHypothesis(this.focusNode);
+            }
+            var tempTranslation = this.getRawTranslation(tempNode);
+            this.that.updateAttentionMatrix(this.that.sentence.join(" "), tempTranslation.join(" "));
         }
         // Center view on focus node
         var transform = this.getTransformation(this.svg.attr("transform"));
@@ -856,7 +864,7 @@ export class BeamTree {
                     isCandidate: true,
                     isEdit: true
                 });
-            } else if (this.focusNode.data.isEdit) {
+            } else if (node && this.focusNode.data.isEdit) { // TODO: this.focusNode is wrong after manual text edit in translation-box
                 node.name = this.currentInput;
             }
             this.updateData(this.treeData);
@@ -876,6 +884,8 @@ export class BeamTree {
         this.updateData(this.treeData);
 
         d3.select('#currentBeamInput').text("Simply type for correction " + this.currentInput);
+
+        this.that.updateAttentionViewWeights(this.that.attention.slice(), d3);
     }
 
     // Creates a curved (diagonal) path from parent to the child node
@@ -1015,6 +1025,14 @@ export class BeamTree {
         return node;
     }
 
+    lastNodeOfBestHypothesis(d) {
+        var node = d;
+        while (node.children && node.children.length > 0) {
+            node = node.children[0];
+        }
+        return node;
+    }
+
     resetGoldenHypothesisBeam(beam) {
         if (!beam) {
             return;
@@ -1037,7 +1055,28 @@ export class BeamTree {
                 this.setGoldenHypothesis(beam.children[i])
             }
         }
+    }
 
+    countNumHypothesis() {
+        return this.numHypothesis(this.root);
+    }
+
+    numHypothesis(d) {
+        var node = d;
+        if (!node) {
+            return 1;
+        }
+
+        var count = 0;
+        for (var child of node.children) {
+            if (child.data.name === Constants.EOS) {
+                return count + 1;
+            }
+            else {
+              count += this.numHypothesis(child);
+            }
+        }
+        return count;
     }
 
     buildColorLegend() {
@@ -1086,7 +1125,7 @@ export class BeamTree {
         rect
             .append("foreignObject")
             .attr("x", 0)
-            .attr("y", 465)
+            .attr("y", 465 - 90)
             .attr("width", "500px")
             .attr("height", "30px")
             .html("<span>Use <kbd>Ctrl</kbd> + <kbd>ENTER</kbd> to accept currently selected Best Translation</span>")
@@ -1095,7 +1134,7 @@ export class BeamTree {
         rect
             .append("foreignObject")
             .attr("x", 0)
-            .attr("y", 490)
+            .attr("y", 490 - 90)
             .attr("width", "300px")
             .attr("height", "30px")
             .html("<span>Type any <kbd>key</kbd> for custom correction</span>")
@@ -1104,7 +1143,7 @@ export class BeamTree {
         rect
             .append("foreignObject")
             .attr("x", 0)
-            .attr("y", 515)
+            .attr("y", 515 - 90)
             .attr("height", "30px")
             .attr("width", "400px")
             .html("<span>Select/Edit with <kbd>ENTER</kbd> or click, delete with <kbd>BACKSPACE</kbd></span>")
@@ -1113,7 +1152,7 @@ export class BeamTree {
         rect
             .append("foreignObject")
             .attr("x", 0)
-            .attr("y", 540)
+            .attr("y", 540 - 90)
             .attr("height", "30px")
             .attr("width", "300px")
             .html("<span>Navigate with <kbd>TAB</kbd> and <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></span>")
@@ -1122,7 +1161,7 @@ export class BeamTree {
         rect
             .append("foreignObject")
             .attr("x", 500)
-            .attr("y", 550)
+            .attr("y", 550 - 90)
             .attr("height", "30px")
             .attr("width", "300px")
             .html('')

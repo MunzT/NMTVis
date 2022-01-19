@@ -1,9 +1,10 @@
-import data as d
 import os
 import random
+import time
+
+import data as d
 import seq2seq.hp as hp
 import shared
-import time
 import torch
 import torch.nn as nn
 from finetuningdataset import FinetuneDataset

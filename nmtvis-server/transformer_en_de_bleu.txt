@@ -1,0 +1,248 @@
+Loading vocab...
+Loading vocab...
+Loading data...
+Loaded 2999 sentences
+Loading model and Trainer...
+LOADING
+Starting test...
+---------------- TRANSLATION 50 ----------------
+Sie und ihre Mutter waren absolut beste Freunde.
+Sie und ihre Mutter waren absolut beste Freunde.
+
+---------------- TRANSLATION 100 ----------------
+Natürlich ist es noch früh im Wahlzyklus.
+Natürlich ist es noch zu früh in der Wahlperiode.
+
+---------------- TRANSLATION 150 ----------------
+Donald Trump und Ben Carson machen heute etwa die Hälfte der Unterstützung der republikanischen Wähler aus, hauptsächlich aufgrund ihres Außenstehenden.
+Auf Donald Trump und Ben Carson entfällt mittlerweile rund die Hälfte der Unterstützung von republikanischen Wählern, vor allem durch ihren Außenseiter-Status.
+
+---------------- TRANSLATION 200 ----------------
+Dies geht aus einer Langzeitstudie eines internationalen Forscherteams hervor, zu dem auch eine Reihe von Mitarbeitern des Deutschen Instituts für Nutritional Research (DIfE) in Potsdam gehören.
+Das geht aus der Langzeitstudie eines internationalen Forscherteams hervor, darunter mehrere Mitarbeiter des Deutschen Instituts für Ernährungsforschung (DIfE) in Potsdam.
+
+---------------- TRANSLATION 250 ----------------
+Der deutsche Wirtschaftsminister Matthias Machnig (SPD) hingegen bezeichnete die Pläne als großen Fortschritt.
+Der deutsche Wirtschaftsstaatssekretär Matthias Machnig (SPD) bezeichnete die Pläne hingegen als großen Fortschritt.
+
+---------------- TRANSLATION 300 ----------------
+Herr Corbyn sagte, daß die Arbeit der TUC Konferenz Änderungsanträge einreichen werde, um die gesamte Idee einer Obergrenze zu streichen.
+Mr Corbyn sagte der TUC-Konferenz, dass Labour Änderungen vorlege, um die ganze Idee einer Begrenzung insgesamt zu entfernen.
+
+---------------- TRANSLATION 350 ----------------
+Richemonts jüngste Verkaufszahlen übertroffen Erwartungen und zeigten auch, dass der Umsatz in China - einem wichtigen Markt für Burberry - wieder gewachsen war.
+Richemonts neueste Verkaufszahlen schlagen alle Erwartungen und zeigten auch, dass der Umsatz in China - ein Schlüsselmarkt für Burberry - wieder Wachstum vermeldet.
+
+---------------- TRANSLATION 400 ----------------
+Auch die Kunden schätzen dieses internationale kulinarische Verständnis.
+Auch bei seinen Kunden komme die kulinarische Völkerverständigung gut an.
+
+---------------- TRANSLATION 450 ----------------
+Der Ausnahmezustand am Dienstag in zwei südlichen Regionen hat den Behörden größere Befugnisse zur Bewältigung der Krise übertragen, so dass sie Straßen schließen und Asylgerichtsverfahren beschleunigen können.
+Der am Dienstag ausgerufene Notstand in zwei südlichen Regionen gab Behörden mehr Befugnisse zur Bewältigung der Krise, so dass sie Straßen absperren und Asylverfahren beschleunigen konnten.
+
+---------------- TRANSLATION 500 ----------------
+Zu all diesen Maßnahmen hat etwa ein Viertel der demokratischen Wähler keine Meinung von Sanders.
+Bei all diesen Messungen hat etwa ein Viertel der demokratischen Wähler keine Meinung von Sanders.
+
+---------------- TRANSLATION 550 ----------------
+Was wird geschehen, wenn die Fed die Zinssätze anhebt?
+Das wird passieren, wenn die Fed die Zinsen erhöht
+
+---------------- TRANSLATION 600 ----------------
+Argues ist es immer ununterscheidbar von kommerziellen Konkurrenten.
+Er argumentiert, dass er zunehmend von kommerziellen Rivalen nicht zu unterscheiden ist.
+
+---------------- TRANSLATION 650 ----------------
+Herr Akram war mit seinen Eltern vor Beginn der jährlichen Pilgerreise von Hadsch in der Großen Moschee gewesen.
+Mr Akram war mit seinen Eltern vor dem Beginn des jährlichen Haddsch in der Großen Moschee.
+
+---------------- TRANSLATION 700 ----------------
+Die Verteidigung argumentierte auf Grund des Vertrauensbruchs, dass der Club niemals jemals einen finanziellen Nachteil erlitten hätte.
+Zum Verwurf der Untreue legte die Verteidigung dar, dass dem Verein zu keinem Zeitpunkt ein Vermögensnachteil entstanden sei.
+
+---------------- TRANSLATION 750 ----------------
+Whitmans Pläne zur Umstrukturierung umfassen etwa 55.000 Arbeitsplatzverluste.
+Whitmans Restrukturierungspläne sehen insgesamt den Abbau von rund 55.000 Stellen vor.
+
+---------------- TRANSLATION 800 ----------------
+Prentiss wurde von Shawn O 'Steen als "gute Person" beschrieben, der sagte, er sei mit ihr seit etwa sieben Jahren verheiratet.
+Prentiss wurde von Shawn O'Steen, der aussagte, dass sie ungefähr sieben Jahre verheiratet waren, als ein "guter Mensch" beschrieben.
+
+---------------- TRANSLATION 850 ----------------
+Moreno schien glücklich, einer roten Karte und der Konzession eines Spot-Kick zu entkommen.
+Moreno schien glücklich, einer Roten Karte und der Verhängung eines Elfmeters entkommen zu sein.
+
+---------------- TRANSLATION 900 ----------------
+Ich verstehe nicht, warum ein Schlagzeuger dort nicht baten kann, und dieser Linkshander hat bereits gezeigt, dass er eine Hölle eines Cricketers ist.
+Ich sehe nicht, warum ein Schlagmann dort nicht schlagen kann, und dieser Linkshänder hat bereits gezeigt, dass er ein Teufelskerl von Cricket-Spieler ist.
+
+---------------- TRANSLATION 950 ----------------
+Es ist fair genug, Cameron nicht einen freien Pass über Europa zu geben, so dass er die Unterstützung von Labour für selbstverständlich halten kann, wie McDonnell sagte.
+Es ist richtig, Cameron keine Freikarte für Europa zu geben, die ihm erlaubt, Labours Unterstützung in der Referendumskampagne für eine Selbstverständlichkeit zu halten, wie McDonnell es sagte.
+
+---------------- TRANSLATION 1000 ----------------
+Im Zusammenhang mit der Lizenzgebühr sagte Johnson dem Ausschuss: "Ich fordere Sie auf, ein regressiveres System zu finden, bei dem es darum geht, wer den besten Nutzen daraus zieht.
+Zur Rundfunkgebühr sagte Johnson dem Ausschuss: "Ich fordere Sie auf, ein eher regressives System in Bezug auf Bedingungen zu finden, wer den besten Wert hieraus erhalten kann.
+
+---------------- TRANSLATION 1050 ----------------
+Dazu gehört ein "einzigartiger Schattierkopf, der hervorragende Behauptungsarmour-Effekte innerhalb des Ziels liefert".
+Dazu gehört ein "einzigartig geformter Gefechtskopf, der herausragende Nachwirkungs-Effekte im Innern des Ziels liefert."
+
+---------------- TRANSLATION 1100 ----------------
+Unternehmer Marcus Gildner glaubt, dass er weiß, wie schnell ökonomisches Wohnen entwickelt werden kann: Mit diesem Projekt baut er Reihenhäuser für Flüchtlinge.
+Der Unternehmer Markus Gildner glaubt zu wissen, wie rasch günstiger Wohnraum geschaffen werden kann: Er baut in einem Projekt Reihenhäuser für Flüchtlinge.
+
+---------------- TRANSLATION 1150 ----------------
+Vor dem Nachtrennen in Singapur am Sonntag teilen 53 Punkte den Vize-Weltmeister vom Titelverteidiger und zwei Mal Weltmeister Hamilton.
+53 Punkte trennen den Vizeweltmeister vor dem Nachtrennen in Singapur an diesem Sonntag von Titelverteidiger und Zweifach-Champion Hamilton.
+
+---------------- TRANSLATION 1200 ----------------
+Von 1972 bis 1983 war er Präsident des Österreichischen Instituts für Design.
+Von 1972 bis 1983 war er Präsident des Österreichischen Instituts für Formgebung.
+
+---------------- TRANSLATION 1250 ----------------
+Ab dem 19. September wird sich die Praxis auf den neuen Chef vorbereiten.
+Ab dem 19. September wird die Praxis für den neuen Chef vorbereitet.
+
+---------------- TRANSLATION 1300 ----------------
+Kroatien: "weit verbreitete Optionen für die Grenzkontrolle"
+Kroatien: "Umfassende Möglichkeiten zur Grenzkontrolle"
+
+---------------- TRANSLATION 1350 ----------------
+Alle zwei Jahre wird eine Schulung für neue Mitarbeiter angeboten.
+Alle zwei Jahre werden Schulungen für neue Mitarbeitende angeboten.
+
+---------------- TRANSLATION 1400 ----------------
+Der Industriedurchschnitt von Dow Jones sank im Mai um bis zu 16% unter seinem Rekordhoch, als Investoren fürchteten, eine sich verlangsamende chinesische Wirtschaft würde das globale Wachstum bremsen.
+Der Dow Jones Industrial Durchschnittswert fiel im Mai um mehr als 16 % unter seinen Höchststand, als Investoren befürchteten, dass eine Verlangsamung der chinesischen Wirtschaft das globale Wachstum drosseln würde.
+
+---------------- TRANSLATION 1450 ----------------
+Jeden Donnerstag geht sie ins Flüchtlingszentrum in der Dillinger Strasse.
+Jeden Donnerstag tut sie es im Asylbewerberheim an der Dillinger Straße.
+
+---------------- TRANSLATION 1500 ----------------
+Er wurde von seinen Kollegen in Schongau gebeten, den Posten des medizinischen Direktors zu übernehmen.
+Er sei von Schongauer Kollegen gebeten worden, den Posten des Ärztlichen Direktors zu übernehmen.
+
+---------------- TRANSLATION 1550 ----------------
+Das Finanzierungsprogramm der KfW-Staatsbank für Flüchtlinge ist in den Städten und Gemeinden bereits gut aufgenommen worden.
+Das Förderprogramm für Flüchtlingsunterkünfte der Staatsbank KfW kommt bei Städten und Gemeinden schon jetzt gut an.
+
+---------------- TRANSLATION 1600 ----------------
+"Wir waren am Sonntag mit der Reinigung nach dem Bridge Festival beschäftigt, als plötzlich zehn Menschen mit Koffer am Eingang zum Zelt standen", sagt Bürgermeister von Wernstein Alois Stadler.
+"Wir waren nach dem Brückenfest am Sonntag mit dem Aufräumen beschäftigt, als plötzlich zehn Leute mit Reisekoffern am Eingang des Zelts standen", so Wernsteins Bürgermeister Alois Stadler.
+
+---------------- TRANSLATION 1650 ----------------
+Linz fordert eine bessere Zuteilung
+Linz fordert eine bessere Aufteilung
+
+---------------- TRANSLATION 1700 ----------------
+Und was denken die Bewohner des Dorfes über seinen Ehrgeiz, der mächtigste Mann der Welt zu werden?
+Und was denken die Dorfbewohner über sein Ziel, mächtigster Mann der Welt zu werden?
+
+---------------- TRANSLATION 1750 ----------------
+Das neue Drama, über einen jüngst verwitweten Vater, der beschließt, nach Neuseeland zu ziehen mit seinen zwei Kindern, durchschnittlich eine sehr beeindruckende 1,219 Millionen Zuschauer.
+Das neue Drama über einen kürzlich verwitweten Vater, der sich entschließt, sich mit seinen beiden Kindern an der Küste Neuseelands niederzulassen, erreichte eine sehr beeindruckende Zahl von 1,219 Millionen Zuschauer.
+
+---------------- TRANSLATION 1800 ----------------
+Hayne stellte ein Foto mit Fans auf, die nach dem Spiel eine australische Flagge innehatten und es in seinen Instagram schickten.
+Hayne posierte für ein Foto mit Fans und hält dabei eine australische Flagge nach dem Spiel und postete es auf seinem Instagram.
+
+---------------- TRANSLATION 1850 ----------------
+Das bedeutet, dass der Dollar 0,8846 €(0.8875) kostet.
+Der Dollar kostete damit 0,8846 (0,8875) Euro.
+
+---------------- TRANSLATION 1900 ----------------
+NHC sagt 60 Prozent Chance auf Zyklon südlich von Kap Verde Inseln
+NHC sagt 60-prozentige Chance für Zyklon südlich der Kapverdischen Inseln voraus
+
+---------------- TRANSLATION 1950 ----------------
+"Es ist unmöglich für alle, nach Europa zu kommen" - Dalai Lama - RT News
+"Es ist unmöglich, dass jeder nach Europa kommen kann" - Dalai Lama - RT-News
+
+---------------- TRANSLATION 2000 ----------------
+Griffiths spricht von Disharmonie auf Celtic, da Deila zugibt, dass Hoops an einem schlechten Ort sind, aber er wird es umdrehen.
+Griffiths spielt das Gerede von Disharmonie bei Celtic Glasgow herunter, Deila gibt zu, dass die Hoops auf einem schlechten Platz stehen, aber dass er das noch mal wenden werde.
+
+---------------- TRANSLATION 2050 ----------------
+Unterdessen ist die Beschäftigung in Schottland in den drei Monaten um 12.000 gesunken, wobei die Zahl der Erwerbstätigen heute bei 2.612.000 liegt.
+In der Zwischenzeit fiel die Beschäftigung in Schottland um 12.000 während der drei Monate, mit der Zahl von Beschäftigten jetzt bei 2.612.000.
+
+---------------- TRANSLATION 2100 ----------------
+Was Sie von mir bekommen werden, ist, was es ist, einen Mann zu sehen, den ich mag sterben einen unnötigen Tod.
+Was Sie von mir bekommen werden, ist, was es heißt, einen Mann einen unnötigen Tod sterben zu sehen.
+
+---------------- TRANSLATION 2150 ----------------
+Menschen, die diese Regeln erlassen, wissen nichts über das Pferd.
+Menschen, die diese Regeln aufstellen, wissen nichts über das Pferd.
+
+---------------- TRANSLATION 2200 ----------------
+Zwei der drei betroffenen Lastkraftwagen hatten sich an langfristige Straßenbauarbeiten in Richtung Basel gebeugt.
+Zwei der drei beteiligten Lastwagen hatten vor einer Dauerbaustelle in Richtung Basel gebremst.
+
+---------------- TRANSLATION 2250 ----------------
+Es ist das Herzstück der Marke.
+Er gehört zum Kern der Marke.
+
+---------------- TRANSLATION 2300 ----------------
+Nach den Prognosen des Bundesinnenministers werden in diesem Jahr rund 800.000 Asylbewerber nach Deutschland kommen, und laut einer Erklärung von Vizekanzler Sigmar Gabriel (SPD) ist Deutschland tatsächlich in der Lage, eine Million Flüchtlinge aufzunehmen.
+Rund 800 000 Asylbewerber werden nach Prognosen des Bundesinnenministeriums in diesem Jahr nach Deutschland kommen, nach Aussage von Vizekanzler Sigmar Gabriel (SPD) ist Deutschland sogar in der Lage, eine Million Flüchtlinge aufzunehmen.
+
+---------------- TRANSLATION 2350 ----------------
+Allerdings müssen dafür zusätzliche Mittel bereitgestellt werden.
+Allerdings müsse dafür zusätzliches Geld ins System fließen.
+
+---------------- TRANSLATION 2400 ----------------
+Stephanie Probst hat ihre eigene Antwort darauf: "Wenn unsere Tiere nicht glücklich sind, dann sind wir auch nicht".
+Stephanie Probst nimmt auch dazu Stellung: "Geht es unseren Tieren nicht gut, geht es auch uns nicht gut".
+
+---------------- TRANSLATION 2450 ----------------
+Wenger akzeptiert das Potenzial eines Teufelskreises, aber Arsenal glaubt, dass eine Verbesserung ihrer Verletzungsbilanz in der letzten Saison fortgesetzt wird.
+Wenger akzeptiert das Potenzial eines Teufelskreises, aber Arsenal glaubt, dass eine Verbesserung bei der Verletzungsquote während der letzten Saison andauern wird.
+
+---------------- TRANSLATION 2500 ----------------
+"Es ist nicht leicht, zu Hause oder weg in der Champions League zu gewinnen, so dass 2-0 zu gewinnen, Ursache unsere Gegner Probleme und sehen bequem auf der Rückseite ist ein guter Start, auch wenn es bestimmte Dinge, die wir brauchen, um zu perfektionieren, wie die Saison geht", sagte Blanc.
+"Es ist nicht einfach, zu Hause oder auswärts in der Champions League zu gewinnen. Daher ist es ein guter Start, 2:0 zu gewinnen, unseren Gegnern Probleme zu verursachen und entspannt zurückzublicken, auch wenn es bestimmte Dinge gibt, die wir im Laufe der Saison noch perfektionieren müssen", sagte Blanc.
+
+---------------- TRANSLATION 2550 ----------------
+Achtmal spanischer Meister, dreimal Tasse Sieger, viermal Champions League-Sieger, zweimal Clubweltmeister, zweimal Europameister, einmal Weltmeister - Xavi 's Titelliste ist atemberaubend.
+Acht Mal spanischer Meister, drei Mal Pokalsieger, vier Mal Champions-League-Sieger, zwei Mal Klub-Weltmeister, zwei Mal Europameister, ein Mal Weltmeister - die Titel-Liste von Xavi ist atemberaubend.
+
+---------------- TRANSLATION 2600 ----------------
+So sehr das Geld ein wunderbarer Preis ist und sich das Leben verändert, so sehr bekommt er die große Genugtuung.
+Wie sehr das Geld ein wunderbarer Preis ist und das Leben verändert, er erhält die großartige Gratifikation.
+
+---------------- TRANSLATION 2650 ----------------
+Er ist seit dem 20. August mit einem angespannten rechten Schild.
+Er hat seit dem 20. August wegen einer Zerrung im rechten Hüftgelenk gefehlt.
+
+---------------- TRANSLATION 2700 ----------------
+Dies ist der Grund, warum der Mond in seiner Umlaufbahn des umgekehrten Planeten leicht weht.
+Demnach taumelt der Mond leicht auf seiner Bahn um den Ringplaneten.
+
+---------------- TRANSLATION 2750 ----------------
+In den nächsten 48 Stunden kann der Süden der Alpen über 100 Liter Regen pro Quadratmeter an Orten erwarten, nach einem großen Regenmenge, der in den letzten Tagen gefallen ist.
+In Summe muss südlich der Alpen in den nächsten 48 Stunden mit teilweise über 100 Liter Regen pro Quadratmeter gerechnet werden, dies nachdem in den letzten Tagen schon grosse Regenmengen gefallen sind.
+
+---------------- TRANSLATION 2800 ----------------
+Die Pläne, die vor Ort gefunden wurden, die Firma in Auftrag gegeben hat, wurden für eine Strecke moduliert: ein Jahr später war alles fast fertig - aber schon vor der offiziellen Eröffnung der BMX-Strecke wurde es wieder geschlossen.
+Pläne gemacht, Platz gefunden, Unternehmen beauftragt, Erdhügel für einen Rundkurs modelliert: Ein Jahr später war fast alles fertig - doch noch vor der offiziellen Eröffnung der BMX-Bahn war damit schon wieder Schluss.
+
+---------------- TRANSLATION 2850 ----------------
+Für Borussia Dortmund wurden alle Hoffnungen zerschlagen, dass Marco Reus im ersten Gruppenspiel der europäischen Liga ein Comeback machen könnte.
+Bei Borussia Dortmund haben sich alle Hoffnungen auf ein Comeback von Marco Reus im ersten Gruppenspiel der Europa League endgültig zerschlagen.
+
+---------------- TRANSLATION 2900 ----------------
+Im Laufe des Spiels im Champions League Spiel mit PSV Eindhoven wurde der Verteidiger von Héctor Moreno getroffen und nach einem langen Bout der Behandlung ersetzt.
+Beim Champions-League-Spiel bei der PSV Eindhoven wurde der Verteidiger bei einem Tackling von Héctor Moreno getroffen und nach langer Behandlung ausgewechselt.
+
+---------------- TRANSLATION 2950 ----------------
+Um dem Wettbewerb aus den asiatischen Regionen standhalten zu können, müssen hochwertige und innovative Produkte gefunden werden.
+Um der Konkurrenz aus dem asiatischen Raum etwas entgegenzusetzen, muss man hochwertige und innovative Produkte finden.
+
+
+
+
+########################################
+BLEU SCORE en-de 33.433082399147224

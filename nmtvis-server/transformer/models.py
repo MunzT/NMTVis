@@ -1,6 +1,5 @@
 import data as d
 import os
-import pytorch_lightning as pl
 import shared
 import time
 import torch
@@ -10,38 +9,60 @@ from finetuningdataset import FinetuneDataset
 from pytorch_lightning import LightningDataModule
 from shared import TranslationModel, MODELS_FOLDER
 from torchtext.data import BucketIterator, Batch
-from transformer.transformer import TransformerWithAttn, TransformerModel
+from tqdm.auto import tqdm
+from transformer.transformer import LabelSmoothingLoss, TransformerWithAttn, TransformerModel, TranslationDataModule
+from transformer.optimizer import Optimizer
+from pytorch_lightning.utilities.cloud_io import load as pl_load
 
 
 def src_sentence_to_input_tensor(src_sentence : str, device=torch.device('cpu')):
     # encode bpe tokens as tensor for transformer input
     bpe_src = src_sentence.split()
-    src_tensor = torch.empty(len(bpe_src), dtype=torch.long, device=device)
+    src_tensor = torch.empty(len(bpe_src), dtype=torch.long)
     for token_idx, bpe_token in enumerate(bpe_src):
         src_tensor[token_idx] = d.SRC.vocab.stoi[bpe_token]
     src_tensor = src_tensor.unsqueeze(0)    # batch=1 x src_seq_len x src_vocab_size
-    return src_tensor
+    return src_tensor.to(device)
 
+
+def _mix_batches(batch_1: torch.LongTensor, batch_2: torch.LongTensor, pad_token_id: int, device: str):
+	if batch_1.size(1) > batch_2.size(1):
+		# pad 2nd batch
+		pad_1 = batch_1.to(device)
+		pad_2 = torch.cat((batch_2.to(device), torch.full((batch_2.size(0), batch_1.size(1) - batch_2.size(1)), fill_value=pad_token_id, device=device)), dim=1)
+	elif batch_1.size(1) < batch_2.size(1):
+		# pad 1st batch
+		pad_1 = torch.cat((batch_1.to(device), torch.full((batch_1.size(0), batch_2.size(1) - batch_1.size(1)), fill_value=pad_token_id, device=device)), dim=1)
+		pad_2 = batch_2.to(device)
+	else:
+		pad_1 = batch_1.to(device)
+		pad_2 = batch_2.to(device)
+	return torch.cat((pad_1, pad_2), dim=0)
 
 
 class FinetuneDataModule(LightningDataModule):
-    def __init__(self, batch_size, src_lang, tgt_lang, pairs) -> None:
+    def __init__(self, batch_size, src_lang, tgt_lang, pairs, test_pairs=None) -> None:
         super().__init__()
         self.batch_size = batch_size
         self.src_lang = src_lang
         self.tgt_lang = tgt_lang
         self.pairs = pairs
+        self.test_pairs = test_pairs
 
 
     def setup(self):
         print("Loading data...")
         src_vocab, tgt_vocab = d.load_vocab(src_lang=self.src_lang, tgt_lang=self.tgt_lang)
+        d.SRC.vocab = src_vocab
+        d.TGT.vocab = tgt_vocab
         self.src_pad_key = src_vocab.stoi[d.BLANK_WORD]
         self.tgt_pad_key = tgt_vocab.stoi[d.BLANK_WORD]
         self.tgt_vocab_size = len(tgt_vocab)
         self.src_vocab_size = len(src_vocab)
         print('Building dataset...')
         self.train_set = FinetuneDataset(pairs=self.pairs, fields=(d.SRC, d.TGT))
+        if self.test_pairs:
+            self.test_set = FinetuneDataset(pairs=self.test_pairs, fields=(d.SRC, d.TGT))
         print("Done.")
 
 
@@ -50,66 +71,137 @@ class FinetuneDataModule(LightningDataModule):
                             sort_key=lambda x: (len(x.src), len(x.trg)),
                             train=True, shuffle=True, repeat=False)
 
+    def test_dataloader(self):
+        return BucketIterator(self.test_set, self.batch_size,
+                            sort_key=lambda x: (len(x.src), len(x.trg)),
+                            train=False, shuffle=False, repeat=False)
 
-    def transfer_batch_to_device(self, batch, device):
+    def transfer_batch_to_device(self, batch, device, dataloader_idx):
         if isinstance(batch, Batch):
             for field in batch.fields:
                 batch_field = getattr(batch, field)
-                batch_device = super().transfer_batch_to_device(batch_field, device)
+                batch_device = super().transfer_batch_to_device(batch_field, device, dataloader_idx)
                 setattr(batch, field, batch_device)
         else:
-            batch = super().transfer_batch_to_device(batch, device)
+            batch = super().transfer_batch_to_device(batch, device, dataloader_idx)
         return batch
 
 
 class TransformerTranslator(TranslationModel):
-    def __init__(self, model, device):
-        self.model = model.to(device)
+    def __init__(self, model: TransformerModel, optim: Optimizer, src_lang: str, tgt_lang: str, ckpt: dict, device):
+        self.model = model
         self.device = device
+        self.ckpt = ckpt
+        self.optim = optim
+        self._mixin_dm = None
+        self._val_dm = None
+        self.src_lang = src_lang
+        self.tgt_lang = tgt_lang
 
 
-    def retrain(self, src_lang, tgt_lang, pairs, last_ckpt, epochs=10, batch_size=32, device='cpu', save_ckpt=True, print_info=True):
-        self.model.train()
-        self.model.freeze_weights()
-        self.model.trafo.encoder.eval()
-        for param in self.model.trafo.encoder.parameters():
-            param.requires_grad = False
-
-        gpus = None if device == 'cpu' else torch.cuda.device_count()
+    def retrain(self, src_lang, tgt_lang, pairs, last_ckpt, epochs=10, batch_size=32, device='cpu', save_ckpt=True,
+                constant_lr: bool = False, accum_grad_steps: int = 1, freeze_encoder: bool = True,
+                orig_data_mixin_percentage: float = 0.0, label_smoothing: float = 0.1, exp_name: str = ''):
+        
+        print("retrain")
+        # setup data
         dm = FinetuneDataModule(batch_size=batch_size, src_lang=src_lang, tgt_lang=tgt_lang, pairs=pairs)
         dm.prepare_data()
         dm.setup()
-        if not self.model.trainer:
-            self.model.trainer = pl.Trainer(gpus=gpus, checkpoint_callback=False, logger=False, resume_from_checkpoint=last_ckpt, min_epochs=epochs, max_epochs=epochs, weights_summary=None, progress_bar_refresh_rate=1 if print_info else 0)
+
+        # setup model and optimizer
+            
+      
+        self.model.train()
+        if freeze_encoder:
+            self.model.freeze_weights()
+            self.model.trafo.encoder.eval()
+        loss_fn = LabelSmoothingLoss(d.TGT.vocab.stoi[d.BLANK_WORD], smoothing=label_smoothing)
+
+        # setup data mixin
+        batch_size = int(batch_size * (1-orig_data_mixin_percentage))
+        mixin_batch_size = int(batch_size * orig_data_mixin_percentage)
+        if mixin_batch_size > 0 and not self._mixin_dm:
+            self._mixin_dm = TranslationDataModule(batch_size=batch_size, src_lang=src_lang, tgt_lang=tgt_lang, only_val=False)
+            self._mixin_dm.setup()
+
+        # train
         print('Training for', epochs,  'epochs')
-        self.model.trainer.fit(self.model, dm)
-        # print('done!')
+        train_losses = []
+        # test_losses = []
+        for epoch in tqdm(range(epochs)):
+            # setup dataloaders
+            train_loader = dm.train_dataloader()
+            if mixin_batch_size > 0:
+                mixin_loader = iter(self._mixin_dm.train_dataloader())
+
+            self.optim.zero_grad()
+            epoch_losses = []
+            for batch_idx, batch in enumerate(train_loader):
+                # prepare batch data
+                if mixin_batch_size > 0:
+                    mixin_batch = next(mixin_loader)
+                    src = _mix_batches(batch.src, mixin_batch.src, self.model.trafo.src_pad_key, device)
+                    tgt = _mix_batches(batch.trg, mixin_batch.trg, self.model.trafo.tgt_pad_key, device)
+                else:
+                    src = batch.src.to(device)
+                    tgt = batch.trg.to(device)
+
+                # forward and backward passes
+                pred, _ = self.model(src, tgt[:,:-1])
+                loss = loss_fn(pred, tgt[:,1:])
+                loss.backward()
+                epoch_losses.append(loss.item())
+
+                # optimizer step
+                if accum_grad_steps == 1 or (batch_idx != 0 and batch_idx % accum_grad_steps == 0):
+                    if constant_lr:
+                        self.optim.constant_step()
+                    else:
+                        self.optim.step()
+                    self.optim.zero_grad()
+                elif batch_idx == len(train_loader) - 1:
+                    if constant_lr:
+                        self.optim.constant_step()
+                    else:
+                        self.optim.step()
+                    self.optim.zero_grad()
+               
+                train_losses.append(sum(epoch_losses)/len(epoch_losses))
+
         self.model.eval()
-        self.model.trainer.current_epoch = 0 # reset epoch for continued training
         if save_ckpt:
-            filename = os.path.join(shared.TRAFO_CHECKPOINT_PATH, f"trafo_{src_lang}_{tgt_lang}_{time.strftime('%Y%m%d-%H%M%S')}_finetuned.pt")
+            filename = os.path.join(shared.TRAFO_CHECKPOINT_PATH, f"{exp_name}_{src_lang}_{tgt_lang}_{time.strftime('%Y%m%d-%H%M%S')}_finetuned.pt")
             print('saving to...', filename)
-            self.model.trainer.save_checkpoint(filename)
+            self.ckpt['state_dict'] = self.model.state_dict()
+            self.ckpt['optimizer_states'][0] = self.optim.state_dict()
+            if not 'train_losses' in self.ckpt:
+                self.ckpt['train_losses'] = []
+            # if not 'test_losses' in ckpt:
+            #     ckpt['test_losses'] = []
+            self.ckpt['train_losses'].append(train_losses)
+            # ckpt['test_losses'].append(test_losses)
+            self.ckpt['epochs'] = epochs
+            self.ckpt['batch_size'] = batch_size
+            self.ckpt['constant_lr'] = constant_lr
+            self.ckpt['accum_grad_steps'] = accum_grad_steps
+            self.ckpt['freeze_encoder'] = freeze_encoder
+            self.ckpt['orig_data_mixin_percentage'] = orig_data_mixin_percentage
+            self.ckpt['label_smoothing'] = label_smoothing
+            torch.save(self.ckpt, filename)
+
             return filename
 
 
     @classmethod
     def load(cls, src_lang="de", tgt_lang='en', device=torch.device('cpu')):
-        D_MODEL = 512
-        D_FF = 2048
-        HEADS = 8
-        P_DROP = 0.1
-        src_pad_key = d.SRC.vocab.stoi[d.BLANK_WORD]
-        tgt_pad_key = d.TGT.vocab.stoi[d.BLANK_WORD]
-        model = TransformerModel.load_from_checkpoint(os.path.join(MODELS_FOLDER, 'transformer', f'trafo_{src_lang}_{tgt_lang}_ensemble.pt'),
-                                                src_vocab_size=len(d.SRC.vocab), tgt_vocab_size=len(d.TGT.vocab),
-                                                src_pad_key=src_pad_key, tgt_pad_key=tgt_pad_key, max_len=d.MAX_LEN,
-                                                d_model=D_MODEL, nhead=HEADS, num_encoder_layers=6,
-                                                num_decoder_layers=6, dim_feedforward=D_FF, dropout=P_DROP,
-                                                activation="relu")
-
-        model.eval()
-        return cls(model, device)
+        print("LOADING")
+        ckpt = pl_load(f'.data/models/transformer/trafo_{src_lang}_{tgt_lang}_ensemble.pt', map_location=lambda storage, loc: storage)
+        model = TransformerModel.load_from_checkpoint(os.path.join(MODELS_FOLDER, 'transformer', f'trafo_{src_lang}_{tgt_lang}_ensemble.pt')).eval().to(device)
+        optim_state = ckpt['optimizer_states'][0]
+        optim = Optimizer(model.parameters())
+        optim.load_state_dict(optim_state)
+        return cls(model, optim, src_lang, tgt_lang, ckpt, device)
 
 
     @torch.no_grad()
@@ -121,9 +213,9 @@ class TransformerTranslator(TranslationModel):
 
 
     @torch.no_grad()
-    def translate(self, sentence, beam_size=3, beam_length=0.6, beam_coverage=0.4, attention_override_map=None, correction_map=None, unk_map=None, max_length=d.MAX_LEN):
+    def translate(self, sentence, beam_size=3, beam_length=0.6, beam_coverage=0.4, attention_override_map=None, correction_map=None, unk_map=None, max_length=d.MAX_LEN, attLayer=-2):
         self.model.eval()
-        hyps = self.beam_search(sentence, beam_size, attention_override_map, correction_map, unk_map,
+        hyps = self.beam_search(sentence, beam_size, attLayer, attention_override_map, correction_map, unk_map,
                                 beam_length=beam_length, beam_coverage=beam_coverage, max_length=max_length)
         words, attention = self.best_translation(hyps)
 
@@ -131,16 +223,16 @@ class TransformerTranslator(TranslationModel):
 
 
     @torch.no_grad()
-    def beam_search(self, input_seq, beam_size=3, attentionOverrideMap=None, correctionMap=None, unk_map=None,
+    def beam_search(self, input_seq, beam_size=3, attLayer=-2, attentionOverrideMap=None, correctionMap=None, unk_map=None,
                     beam_length=0.6, beam_coverage=0.4,
                     max_length=d.MAX_LEN):
 
         self.model.eval()
 
-        src_tensor = src_sentence_to_input_tensor(input_seq, device='cpu')
+        src_tensor = src_sentence_to_input_tensor(input_seq, device=self.device)
         enc_output, src_key_padding_mask = self.model.trafo.encode(src_tensor)   # 1 X src_seq_len(BPE)
 
-        beam_search = BeamSearch(self.model.trafo, src_tensor, enc_output, src_key_padding_mask, beam_size, attentionOverrideMap,
+        beam_search = BeamSearch(self.model.trafo, src_tensor, enc_output, src_key_padding_mask, beam_size, attLayer, attentionOverrideMap,
                                  correctionMap, unk_map, beam_length=beam_length, beam_coverage=beam_coverage,
                                  max_length=max_length)
         result = beam_search.search()
@@ -158,11 +250,11 @@ class TransformerTranslator(TranslationModel):
         src_tensor = torch.empty(len(bpe_src), dtype=torch.long)
         for token_idx, bpe_token in enumerate(bpe_src):
             src_tensor[token_idx] = d.SRC.vocab.stoi[bpe_token]
-        src_tensor = src_tensor.unsqueeze(0)    # batch=1 x src_seq_len
+        src_tensor = src_tensor.unsqueeze(0).to(self.device)    # batch=1 x src_seq_len
         enc = self.model.trafo.encode(src_tensor)
         
         while tokens_so_far[-1] != d.TGT.vocab.stoi[d.EOS_WORD] and step < max_len:
-            output = self.model.trafo.decode_step(src_tensor, enc, torch.tensor(tokens_so_far, dtype=torch.long).view(1,-1))[0]
+            output = self.model.trafo.decode_step(src_tensor, enc, torch.tensor(tokens_so_far, dtype=torch.long, device=self.device).view(1,-1))[0]
             new_tokens = output.argmax(dim=-1).view(1, -1)
             step += 1
             tokens_so_far.append(new_tokens.view(-1)[-1].item())
@@ -172,13 +264,15 @@ class TransformerTranslator(TranslationModel):
 
 class BeamSearch:
     def __init__(self, transformer: TransformerWithAttn, src_tensor, encoder_outputs, src_key_padding_mask,
-                 beam_size=3, attentionOverrideMap=None, correctionMap=None, unk_map=None, beam_length=0.6,
+                 beam_size=3, attLayer=-2, attentionOverrideMap=None, correctionMap=None, unk_map=None, beam_length=0.6,
                  beam_coverage=0.4, max_length=d.MAX_LEN):
         self.model = transformer
+        self.device = next(self.model.parameters()).device
         self._src_enc = encoder_outputs
         self.src_key_padding_mask = src_key_padding_mask
         self._src_tensor = src_tensor
         self.beam_size = beam_size
+        self.attLayer = attLayer
         self.max_length = max_length
         self.attention_override_map = attentionOverrideMap
         self.correction_map = correctionMap
@@ -237,20 +331,26 @@ class BeamSearch:
         topk_log_probs = [[0 for _ in range(self.beam_size)] for _ in range(len(tokens_sofar))]
 
         # decode next step
-        decoder_input = torch.as_tensor(tokens_sofar, dtype=torch.long)
-        new_tgt_probs, dec_attn = self.model.decode_step(self.src_key_padding_mask.repeat(len(tokens_sofar), 1), self._src_enc.repeat(1, len(tokens_sofar), 1), tgt_so_far=decoder_input) # new_tgt_probs: 1 x tgt_seq_len + 1 x tgt_vocab_size
+        decoder_input = torch.as_tensor(tokens_sofar, dtype=torch.long, device=self.device)
+        new_tgt_probs, dec_attn = self.model.decode_step(self.src_key_padding_mask.repeat(len(tokens_sofar), 1),
+                                                         self._src_enc.repeat(1, len(tokens_sofar), 1),
+                                                         tgt_so_far=decoder_input) # new_tgt_probs: 1 x tgt_seq_len + 1 x tgt_vocab_size
         new_tgt_probs = new_tgt_probs[:,-1,:].squeeze(dim=1)
-        # mean attention
-        # dec_attn = torch.cat([layer_att.unsqueeze(dim=0) for layer_att in dec_attn], dim=0) # layers x batch x tgt seq len x src seq len
-        # dec_attn = torch.mean(dec_attn, dim=0) # batch x tgt seq len x src seq len
+
         # second last layer attention: created best alignments in our experiments
-        dec_attn = dec_attn[-2]  # batch x tgt seq len x src seq len
+        #temp_dec_attn = dec_attn[-2]  # batch x tgt seq len x src seq len
+
+        if self.attLayer is not None:
+            temp_dec_attn = dec_attn[self.attLayer]  # batch x tgt seq len x src seq len
+        else:
+            # mean attention
+            temp_dec_attn = torch.cat([layer_att.unsqueeze(dim=0) for layer_att in dec_attn], dim=0) # layers x batch x tgt seq len x src seq len
+            temp_dec_attn = torch.mean(temp_dec_attn, dim=0) # batch x tgt seq len x src seq len
 
         # Loop over all hypotheses
         for i, tokens in enumerate(tokens_sofar):
             if self.correction_map and partials[i] in self.correction_map:
                 word = self.correction_map[partials[i]]
-                print("Corrected {} for partial= {}".format(word, partials[i]))
                 if not word in d.TGT.vocab.stoi:
                     topk_words[i][0] = word
                     is_unk[i] = True
@@ -259,13 +359,13 @@ class BeamSearch:
 
             new_tgt_probs_i = F.log_softmax(new_tgt_probs[i], dim=-1)   # tgt_vocab_size
             topk_v, topk_i = new_tgt_probs_i.topk(self.beam_size)
-            topk_v, topk_i = topk_v.numpy(), topk_i.numpy()
+            topk_v, topk_i = topk_v.cpu().numpy(), topk_i.cpu().numpy()
 
             topk_ids[i] = topk_i.tolist()
             topk_log_probs[i] = topk_v.tolist()
             topk_words[i] = [d.TGT.vocab.itos[id] if not topk_words[i][j] else topk_words[i][j] for j, id in enumerate(topk_ids[i])]
 
-            attns[i] = dec_attn[i, -1, :].tolist() # tgt seq len x src seq len -> src_seq_len
+            attns[i] = temp_dec_attn[i, -1, :].tolist() # tgt seq len x src seq len -> src_seq_len
 
         return topk_ids, topk_words, topk_log_probs, attns, is_unk
 
@@ -288,7 +388,7 @@ class BeamSearch:
         start_attn = [[0 for _ in range(self._src_tensor.size(-1))]]
 
         #decode
-        decoder_input = torch.as_tensor(tokens + prefix, dtype=torch.long).view(1, -1)
+        decoder_input = torch.as_tensor(tokens + prefix, dtype=torch.long, device=self.device).view(1, -1)
         tgt_probs, dec_attn = self.model.decode_step(self.src_key_padding_mask, self._src_enc, tgt_so_far=decoder_input)
         tgt_probs = F.log_softmax(tgt_probs[0], dim=-1) # batch x seq length x vocab -> seq length x voacb
 
@@ -317,7 +417,7 @@ class BeamSearch:
         result = []
 
         steps = 0
-        while steps < self.max_length * 2 and len(result) < self.beam_size:
+        while steps < self.max_length and len(result) < self.beam_size:
             tokens_sofar = [hyp.tokens for hyp in hyps]
             partials = [self.to_partial(hyp.tokens) for hyp in hyps]
             all_hyps = []

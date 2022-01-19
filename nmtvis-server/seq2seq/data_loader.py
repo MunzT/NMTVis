@@ -1,7 +1,8 @@
-import data
 import re
 import unicodedata
 from collections import OrderedDict
+
+import data
 from seq2seq.hp import PAD_token, SOS_token, EOS_token, UNK_token, UNK_text, MIN_LENGTH
 
 

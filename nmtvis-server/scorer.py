@@ -1,5 +1,8 @@
 import math
 
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 
 class Scorer:
     def compute_scores(self, source, translation, attention, keyphrases, reference):
@@ -20,11 +23,6 @@ class Scorer:
             return score
 
         # https://www.geeksforgeeks.org/python-measure-similarity-between-two-sentences-using-cosine-similarity/
-
-        # Program to measure similarity between
-        # two sentences using cosine similarity.
-        from nltk.corpus import stopwords
-        from nltk.tokenize import word_tokenize
 
         X = sentence.replace("@@ ", "")
         Y = reference.replace("@@ ", "")

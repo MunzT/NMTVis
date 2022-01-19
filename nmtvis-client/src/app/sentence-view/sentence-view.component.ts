@@ -9,6 +9,7 @@ import {DocumentService} from '../services/document.service';
 import {ExperimentService} from '../services/experiment.service';
 import {MatSnackBar} from '@angular/material';
 import {Constants} from '../constants';
+import { MatFormFieldModule, MatSelectModule, MatInputModule } from '@angular/material';
 
 @Component({
     selector: 'app-sentence-view',
@@ -17,8 +18,17 @@ import {Constants} from '../constants';
 })
 
 export class SentenceViewComponent implements OnInit, AfterContentInit {
-    title = 'DNN Vis';
-    ATTENTION_THRESHOLD = 0.2;
+    attentionThreshold = 0.2;
+    beamSize = 3;
+    showMatrix = false;
+
+    layerOptions = ["0", "1", "2", "3", "4", "5", "average"];
+    attLayer = "4"
+    showLayeroptions = false
+
+    prev_beam_size = this.beamSize
+    prev_attLayer = this.attLayer
+    prev_attentionThreshold = this.attentionThreshold
 
     sentence = [];
     translation = [];
@@ -37,11 +47,11 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
     correctionMap = {};
     unkMap = {};
     documentUnkMap = {};
-    beamSize = 3;
     beamLength = 1;
     beamCoverage = 1;
     sentenceId;
     documentId;
+    showAttentionMatrix = true;
     beamTree;
     beam;
     objectKey = Object.keys;
@@ -86,8 +96,14 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                     that.translation = sentence.translation.split(" ");
                     that.attention = sentence.attention;
                     that.documentUnkMap = sentence.document_unk_map;
-                    that.updateTranslation(sentence.inputSentence, sentence.translation);
+                    that.showLayeroptions = (sentence.model === "trafo");
                     that.updateBeamGraph(sentence.beam);
+                    that.beamSize = that.beamTree.countNumHypothesis();
+                    that.prev_beam_size = that.beamSize;
+                    that.prev_attLayer = that.attLayer
+                    that.prev_attentionThreshold = that.attentionThreshold
+                    that.updateAttentionMatrix(sentence.inputSentence, sentence.translation);
+                    that.updateTranslation(sentence.inputSentence, sentence.translation);
                 });
         });
     }
@@ -102,13 +118,57 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         this.http.post(this.baseUrl + '/beamUpdate', {
             sentence: this.encodeText(this.inputSentence),
             beam_size: this.beamSize,
+            attLayer : Number(this.attLayer),
             beam_length: this.beamLength,
             beam_coverage: this.beamCoverage,
             attentionOverrideMap: this.attentionOverrideMap,
             correctionMap: this.correctionMap,
             unk_map: this.unkMap
         }).subscribe(data => {
-            this.updateBeamGraph(data["beam"]);
+            this.updateBeamGraph(data["beam"], true);
+            this.updateAttentionViewWeights(this.attention.slice(), d3);
+        });
+    }
+
+    showMatrixChanged() {
+        this.updateAttentionMatrix(this.sentence.join(" "), this.translation.join(" "));
+    }
+
+    attentionThresholdChange() {
+        this.documentService.getSentence(this.documentId, this.sentenceId)
+        .subscribe((sentence: any) => {
+            this.sentence = sentence.inputSentence.split(" ");
+            this.inputSentence = this.decodeText(sentence.inputSentence);
+
+            this.translation = sentence.translation.split(" ");
+            this.attention = sentence.attention;
+            this.documentUnkMap = sentence.document_unk_map;
+            this.updateTranslation(sentence.inputSentence, sentence.translation);
+        });
+    }
+
+    layerChange() {
+        this.http.post(this.baseUrl + '/layerUpdate', {
+            sentence: this.encodeText(this.inputSentence),
+            beam_size: this.beamSize,
+            attLayer : Number(this.attLayer),
+            beam_length: this.beamLength,
+            beam_coverage: this.beamCoverage,
+            attentionOverrideMap: this.attentionOverrideMap,
+            correctionMap: this.correctionMap,
+            unk_map: this.unkMap
+        }).subscribe(data => {
+            this.documentService.getSentence(this.documentId, this.sentenceId)
+                .subscribe((sentence: any) => {
+                    this.sentence = sentence.inputSentence.split(" ");
+                    this.inputSentence = this.decodeText(sentence.inputSentence);
+
+                    this.translation = sentence.translation.split(" ");
+                    this.attention = sentence.attention;
+                    this.documentUnkMap = sentence.document_unk_map;
+                    this.updateBeamGraph(data["beam"], true);
+                    this.updateAttentionViewWeights(this.attention.slice(), d3);
+                });
         });
     }
 
@@ -129,6 +189,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             attentionOverrideMap: this.attentionOverrideMap,
             correctionMap: this.correctionMap,
             beam_size: this.beamSize,
+            attLayer : Number(this.attLayer),
             beam_length: this.beamLength,
             beam_coverage: this.beamCoverage,
             unk_map: this.unkMap,
@@ -143,6 +204,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             attentionOverrideMap: this.attentionOverrideMap,
             correctionMap: this.correctionMap,
             beam_size: this.beamSize,
+            attLayer : this.attLayer,
             beam_length: this.beamLength,
             beam_coverage: this.beamCoverage,
             unk_map: this.unkMap,
@@ -151,21 +213,353 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         });
     }
 
+    attentionMouseOverSource(d, i, attention) {
+        var svg = d3.select("#attention_vis");
+
+        svg.selectAll("path")
+            .classed("fade-out", true);
+        svg.selectAll("[source-id='" + i + "']")
+            .classed("attention-selected", true);
+
+        this.clearAttention();
+        this.addEvent("source-hover", d);
+        svg.select("#source-word-text-" + i).style("font-weight", "bold");
+        svg.select("#source-word-text-matrix-" + i).style("font-weight", "bold");
+        svg.select("#source-word-text-" + i).style("text-decoration", "underline");
+        svg.select("#source-word-text-matrix-" + i).style("text-decoration", "underline");
+        svg.select("#source-word-box-" + i).style("opacity", 1);
+        svg.select("#source-word-box-matrix-" + i).style("opacity", 1);
+
+        for (var j = 0; j < attention.length; j++) {
+            svg.select("#target-word-box-" + j).style("opacity", Math.sqrt(attention[j][i]));
+            svg.select("#target-word-box-matrix-" + j).style("opacity", Math.sqrt(attention[j][i]));
+            if (attention[j][i] > this.attentionThreshold) {
+                svg.select("#target-word-text-" + j).style("font-weight", "bold");
+                svg.select("#target-word-text-" + j).style("text-decoration", "underline");
+                svg.select("#target-word-text-matrix-" + j).style("font-weight", "bold");
+                svg.select("#target-word-text-matrix-" + j).style("text-decoration", "underline");
+            }
+        }
+    }
+
+    attentionMouseOverTarget(d, i, attention) {
+        var svg = d3.select("#attention_vis");
+
+        svg.selectAll("path")
+            .classed("fade-out", true);
+        svg.selectAll("[target-id='" + i + "']")
+            .classed("attention-selected", true);
+
+        this.clearAttention();
+        svg.select("#target-word-text-" + i).style("font-weight", "bold");
+        svg.select("#target-word-text-" + i).style("text-decoration", "underline");
+        svg.select("#target-word-text-matrix-" + i).style("font-weight", "bold");
+        svg.select("#target-word-text-matrix-" + i).style("text-decoration", "underline");
+        this.addEvent("target-hover", d);
+
+        svg.select("#target-word-box-" + i).style("opacity", 1);
+        svg.select("#target-word-box-matrix-" + i).style("opacity", 1);
+        if (attention.length > i) {
+            for (var j = 0; j < attention[i].length; j++) {
+
+                svg.select("#source-word-box-" + j).style("opacity", Math.sqrt(attention[i][j]));
+                svg.select("#source-word-box-matrix-" + j).style("opacity", Math.sqrt(attention[i][j]));
+
+                if (attention[i][j] > this.attentionThreshold) {
+                    svg.select("#source-word-text-" + j).style("font-weight", "bold");
+                    svg.select("#source-word-text-" + j).style("text-decoration", "underline");
+                    svg.select("#source-word-text-matrix-" + j).style("font-weight", "bold");
+                    svg.select("#source-word-text-matrix-" + j).style("text-decoration", "underline");
+                }
+            }
+        }
+    }
+
+    attentionMouseOverCell(d, i, element, attention) {
+        var i2 = d3.select(element.parentNode).attr("row");
+
+        var svg = d3.select("#attention_vis");
+
+        this.clearAttention();
+
+        svg.select("#target-word-text-" + i2).style("font-weight", "bold");
+        svg.select("#target-word-text-" + i2).style("text-decoration", "underline");
+        svg.select("#target-word-text-matrix-" + i2).style("font-weight", "bold");
+        svg.select("#target-word-text-matrix-" + i2).style("text-decoration", "underline");
+
+        svg.select("#source-word-text-" + i).style("font-weight", "bold");
+        svg.select("#source-word-text-" + i).style("text-decoration", "underline");
+        svg.select("#source-word-text-matrix-" + i).style("font-weight", "bold");
+        svg.select("#source-word-text-matrix-" + i).style("text-decoration", "underline");
+
+        for (var j = 0; j < attention.length; j++) {
+            svg.select("#target-word-box-" + j).style("opacity", Math.sqrt(attention[j][i]));
+            svg.select("#target-word-box-matrix-" + j).style("opacity", Math.sqrt(attention[j][i]));
+        }
+
+        if (attention.length > i) {
+            for (var j = 0; j < attention[i2].length; j++) {
+                svg.select("#source-word-box-" + j).style("opacity", Math.sqrt(attention[i2][j]));
+                svg.select("#source-word-box-matrix-" + j).style("opacity", Math.sqrt(attention[i2][j]));
+            }
+        }
+    }
+
+    attentionMouseOut(d, i, attention) {
+        var svg = d3.select("#attention_vis");
+
+        svg.selectAll(".fade-out").classed("fade-out", false);
+        svg.select("#source-word-text-" + i).style("font-weight", "normal");
+        svg.select("#source-word-text-matrix-" + i).style("font-weight", "normal");
+        svg.select("#source-word-text-" + i).style("text-decoration", "none");
+        svg.select("#source-word-text-matrix-" + i).style("text-decoration", "none");
+        svg.select("#target-word-text-" + i).style("font-weight", "normal");
+        svg.select("#target-word-text-" + i).style("text-decoration", "none");
+        svg.select("#target-word-text-matrix-" + i).style("font-weight", "normal");
+        svg.select("#target-word-text-matrix-" + i).style("text-decoration", "none");
+        this.addEvent("source-hover-out", d);
+        this.addEvent("target-hover-out", d);
+        svg.selectAll('.attention-selected').classed("attention-selected", false);
+        this.updateAttentionViewWeights(attention, svg);
+        svg.selectAll(".target-word-text").style("font-weight", "normal");
+        svg.selectAll(".target-word-text").style("text-decoration", "none");
+        svg.selectAll(".source-word-text").style("font-weight", "normal");
+        svg.selectAll(".source-word-text").style("text-decoration", "none");
+    }
+
+    updateAttentionMatrix(source: string, translation: string) {
+
+        if (!this.showMatrix) {
+            d3.selectAll("#attention-matrix-vis").remove();
+            return;
+        }
+
+        var that = this;
+
+        var sourceWords_bpe = source.split(" ");
+        var targetWords_bpe = translation.split(" ");
+        var sourceWords = sourceWords_bpe.slice(0);;
+        var targetWords = targetWords_bpe.slice(0);;
+
+        var index = 0;
+        for (var s of sourceWords_bpe) {
+            sourceWords[index] = this.decodeText(s);
+            index++;
+        }
+        index = 0;
+        for (var t of targetWords_bpe) {
+            targetWords[index] = this.decodeText(t);
+            index++;
+        }
+
+        var textWidths = [];
+        for (var s of sourceWords) {
+          textWidths.push(Math.ceil(this.calculateTextWidth(s)));
+        }
+
+        var maxSourceWidth = Math.max(...textWidths);
+
+        textWidths = [];
+        for (var t of targetWords) {
+          textWidths.push(Math.ceil(this.calculateTextWidth(t)));
+        }
+        var maxTargetWidth = Math.max(...textWidths);
+
+        var margin = {top: maxSourceWidth + 20, right: 20, bottom: 10, left: maxTargetWidth + 20},
+            width = sourceWords.length * 20,
+            height = targetWords.length * 20;
+
+        d3.selectAll("#attention-matrix-vis").remove();
+        var svg = d3.select("#attention-matrix").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("id", "attention-matrix-vis")
+            .append("g")
+            .attr("transform", "translate("
+                + margin.left + "," + margin.top + ")");
+
+        var range: any = ["#f9f9f9", "#ffa500"];
+        var colorScale: any = d3.scaleLinear().domain([0, 1]).range(range);
+
+        var attention = this.attention.slice();
+
+        var sourceEnter = svg.append('g').selectAll('text').data(sourceWords).enter();
+
+        sourceEnter.append("rect")
+            .attr("transform", (d, i) => {
+                    return "translate(" + (i * 20 + 3) + ", 0)" + "rotate(90)";
+                })
+            .attr("x", function (d, i) {
+                return - 10 - that.calculateTextWidth(d);
+            })
+            .attr("y", function (d, i) {
+                return -10 - 3;
+            })
+            .attr("width", function (d) {
+                return that.calculateTextWidth(d);
+            })
+            .attr("height", 15)
+            .classed("source-word-box", true)
+            .attr("id", function (d, i) {
+                return "source-word-box-matrix-" + i;
+            })
+            .on("mouseover", function (d, i) {
+                that.attentionMouseOverSource(d, i, attention);
+            })
+            .on("mouseout", function (d, i) {
+                that.attentionMouseOut(d, i, attention);
+            });
+
+        var targetEnter = svg.append('g').selectAll('text').data(targetWords).enter();
+
+        targetEnter.append("rect")
+            .attr("x", function (d, i) {
+                return -that.calculateTextWidth(d) - 9;
+            })
+            .attr("y", function (d, i) {
+                return i * 20 + 1;
+            })
+            .attr("width", function (d) {
+                return that.calculateTextWidth(d);
+            })
+            .attr("height", 15)
+            .classed("target-word-box", true)
+            .attr("id", function (d, i) {
+                return "target-word-box-matrix-" + i;
+            })
+            .on("mouseover", function (d, i) {
+                that.attentionMouseOverTarget(d, i, attention);
+            })
+            .on("mouseout", function (d, i) {
+                that.attentionMouseOut(d, i, attention);
+            });
+
+        sourceEnter.append("g")
+            .attr("transform", (d, i) => {
+                return "translate(" + (i * 20 + 6) + ", -10)" + "rotate(90)";
+            })
+            .append("text")
+            .classed("source-word-text", true)
+            .attr("id", function (d, i) {
+                return "source-word-text-matrix-" + i;
+            })
+            .style("font-size", "12px")
+            .style("text-anchor", "end")
+            .text((d, i) => sourceWords[i]);
+
+        targetEnter.append("g")
+            .attr("transform", (d, i) => {
+                return "translate(-10," + (i * 20 + 12) + ")";
+            })
+            .append("text")
+            .classed("target-word-text", true)
+            .attr("id", function (d, i) {
+                return "target-word-text-matrix-" + i;
+            })
+            .style("font-size", "12px")
+            .style("text-anchor", "end")
+            .text((d, i) => (targetWords[i] === Constants.EOS ? "EOS" : targetWords[i]));
+
+        var rowsEnter = svg.selectAll(".row")
+            .data(attention)
+            .enter();
+
+        var rows = rowsEnter.append("g")
+            .attr("class", "row")
+            .attr("transform", (d, i) => {
+                return "translate(0," + i * 20 + ")";
+            })
+            .attr("row", (d, i) => {
+                return i;
+            });
+        var squares = rows.selectAll(".attention-cell")
+            .data(d => d)
+            .enter().append("rect")
+            .attr("x", (d, i) => i * 20)
+            .attr("width", 20 - 4)
+            .attr("height", 20 - 4)
+            .style("fill", d => colorScale(d))
+            .on("mouseover", function (d, i) {
+                that.attentionMouseOverCell(d, i, this, attention);
+            })
+            .on("mouseout", function (d, i) {
+                that.attentionMouseOut(d, i, attention);
+            });
+
+        var sourceLines = svg.selectAll(".source-lines")
+            .data(sourceWords_bpe)
+            .enter()
+            .append("line")
+            .attr("class", "source-lines")
+            .style("stroke", "black")
+            .style("stroke-width", 3)
+            .attr("y1", -2)
+            .attr("x1", (d, i) => (i * 20))
+            .attr("y2", -2)
+            .attr("x2", (d, i) => (i * 20 + 20 + (d.endsWith("@@") ? + 1 : -4)));
+
+        var sourceLines = svg.selectAll(".source-lines-2")
+            .data(sourceWords_bpe)
+            .enter()
+            .append("line")
+            .attr("class", "source-lines-2")
+            .style("stroke", "#777")
+            .style("stroke-width", 1)
+            .attr("y1", height - 4)
+            .attr("x1", (d, i) => ((i + 1) * 20 - 2))
+            .attr("y2", -20)
+            .attr("x2", (d, i) => ((i + 1) * 20 - 2))
+            .style("opacity", (d, i) => d.endsWith("@@") || (i == sourceWords_bpe.length - 1) ? 0 : 1);
+
+        var targetLines = svg.selectAll(".target-lines")
+            .data(targetWords_bpe)
+            .enter()
+            .append("line")
+            .attr("class", "target-lines")
+            .style("stroke", "black")
+            .style("stroke-width", 3)
+            .attr("y1", (d, i) => (i * 20))
+            .attr("x1", -2)
+            .attr("y2", (d, i) => (i * 20 + 20 + (d.endsWith("@@") ? + 1 : -4)))
+            .attr("x2", -2);
+
+        var targetLines = svg.selectAll(".target-lines-2")
+            .data(targetWords_bpe)
+            .enter()
+            .append("line")
+            .attr("class", "target-lines-2")
+            .style("stroke", "#777")
+            .style("stroke-width", 1)
+            .attr("y1", (d, i) => ((i + 1) * 20 - 2))
+            .attr("x1", width - 4)
+            .attr("y2", (d, i) => ((i + 1) * 20 - 2))
+            .attr("x2", -20)
+            .style("opacity", (d, i) => d.endsWith("@@") || (i == targetWords_bpe.length - 1) ? 0 : 1);
+
+        that.updateAttentionViewWeights(attention, svg);
+    }
+
     onCurrentAttentionChange() {
         for (var i = 0; i < this.beamAttention.length; i++) {
-            if (this.beamAttention[i] > this.ATTENTION_THRESHOLD) {
+            if (this.beamAttention[i] > this.attentionThreshold) {
                 d3.select("#source-word-text-" + i).style("font-weight", "bold");
                 d3.select("#source-word-text-" + i).style("text-decoration", "underline");
+                d3.select("#source-word-text-matrix-" + i).style("font-weight", "bold");
+                d3.select("#source-word-text-matrix-" + i).style("text-decoration", "underline");
             }
             let opacity = this.beamAttention[i] < 0.1 ? 0 : Math.sqrt(this.beamAttention[i]);
             d3.select("#source-word-box-" + i).style("opacity", opacity);
+            d3.select("#source-word-box-matrix-" + i).style("opacity", opacity);
         }
     }
 
     highlightTargetNode(i) {
         d3.select("#target-word-text-" + i).style("font-weight", "bold");
         d3.select("#target-word-text-" + i).style("text-decoration", "underline");
+        d3.select("#target-word-text-matrix-" + i).style("font-weight", "bold");
+        d3.select("#target-word-text-matrix-" + i).style("text-decoration", "underline");
         d3.select("#target-word-box-" + i).style("opacity", 1);
+        d3.select("#target-word-box-matrix-" + i).style("opacity", 1);
     }
 
     clearAttentionSelection() {
@@ -214,10 +608,13 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         for (var j = 0; j < attention[i].length; j++) {
 
             svg.select("#source-word-box-" + j).style("opacity", Math.sqrt(attention[i][j]));
+            svg.select("#source-word-box-matrix-" + j).style("opacity", Math.sqrt(attention[i][j]));
 
-            if (attention[i][j] > this.ATTENTION_THRESHOLD) {
+            if (attention[i][j] > this.attentionThreshold) {
                 svg.select("#source-word-text-" + j).style("font-weight", "bold");
                 svg.select("#source-word-text-" + j).style("text-decoration", "underline");
+                svg.select("#source-word-text-matrix-" + j).style("font-weight", "bold");
+                svg.select("#source-word-text-matrix-" + j).style("text-decoration", "underline");
             }
         }
     }
@@ -237,6 +634,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
     }
 
     updateTranslation(source: string, translation: string) {
+
         var that = this;
         var textWidth = 70;
         var leftMargin = 120;
@@ -248,7 +646,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         var attention = this.attention.slice();
 
         var sourceWords = source.split(" ");
-        sourceWords.push("EOS");
+        //sourceWords.push("EOS");
 
         var targetWords = translation.split(" ");
 
@@ -267,7 +665,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         for (var i = 1; i < attention.length; i++) {
            for (var j = 0; j < attention[i].length; j++) {
                 var maxJ = this.lastMaxIndex(attention[i]);
-                if (attention[i][maxJ] > this.ATTENTION_THRESHOLD
+                if (attention[i][maxJ] > this.attentionThreshold
                     && (maxJ !== attention[i].length - 1 || i === this.inputSentence.split(" ").length - 1)) {
                     furthestRelevantSourceIndex = Math.max(furthestRelevantSourceIndex, maxJ);
                 }
@@ -354,35 +752,10 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 return "source-word-box-" + i;
             })
             .on("mouseover", function (d, i) {
-                svg.selectAll("path")
-                    .classed("fade-out", true);
-                svg.selectAll("[source-id='" + i + "']")
-                    .classed("attention-selected", true);
-
-                that.clearAttention();
-                that.addEvent("source-hover", d);
-                svg.select("#source-word-text-" + i).style("font-weight", "bold");
-                svg.select("#source-word-text-" + i).style("text-decoration", "underline");
-                svg.select("#source-word-box-" + i).style("opacity", 1);
-
-                for (var j = 0; j < attention.length; j++) {
-                    svg.select("#target-word-box-" + j).style("opacity", Math.sqrt(attention[j][i]));
-                    if (attention[j][i] > that.ATTENTION_THRESHOLD) {
-                        svg.select("#target-word-text-" + j).style("font-weight", "bold");
-                        svg.select("#target-word-text-" + j).style("text-decoration", "underline");
-                    }
-
-                }
+                that.attentionMouseOverSource(d, i, attention)
             })
             .on("mouseout", function (d, i) {
-                svg.selectAll(".fade-out").classed("fade-out", false);
-                svg.select("#source-word-text-" + i).style("font-weight", "normal");
-                svg.select("#source-word-text-" + i).style("text-decoration", "none");
-                that.addEvent("source-hover-out", d);
-                svg.selectAll('.attention-selected').classed("attention-selected", false);
-                that.updateAttentionViewWeights(attention, svg);
-                svg.selectAll(".target-word-text").style("font-weight", "normal");
-                svg.selectAll(".target-word-text").style("text-decoration", "none");
+                that.attentionMouseOut(d, i, attention);
             });
 
         sourceEnter.append("g")
@@ -392,10 +765,6 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 return "translate(" + x + "," + y + ")";
             })
             .append("text")
-            .attr("transform", function (d) {
-                var xScale = 1;
-                return "scale(" + xScale + ",1)"
-            })
             .classed("source-word-text", true)
             .attr("id", function (d, i) {
                 return "source-word-text-" + i;
@@ -423,39 +792,10 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 return "target-word-box-" + i;
             })
             .on("mouseover", function (d, i) {
-                svg.selectAll("path")
-                    .classed("fade-out", true);
-                svg.selectAll("[target-id='" + i + "']")
-                    .classed("attention-selected", true);
-
-                that.clearAttention();
-                svg.select("#target-word-text-" + i).style("font-weight", "bold");
-                svg.select("#target-word-text-" + i).style("text-decoration", "underline");
-                that.addEvent("target-hover", d);
-
-                svg.select("#target-word-box-" + i).style("opacity", 1);
-                if (attention.length > i) {
-                    for (var j = 0; j < attention[i].length; j++) {
-
-                        svg.select("#source-word-box-" + j).style("opacity", Math.sqrt(attention[i][j]));
-
-                        if (attention[i][j] > that.ATTENTION_THRESHOLD) {
-                            svg.select("#source-word-text-" + j).style("font-weight", "bold");
-                            svg.select("#source-word-text-" + j).style("text-decoration", "underline");
-                        }
-
-                    }
-                }
+                that.attentionMouseOverTarget(d, i, attention);
             })
             .on("mouseout", function (d, i) {
-                svg.selectAll(".fade-out").classed("fade-out", false);
-                svg.select("#target-word-text-" + i).style("font-weight", "normal");
-                svg.select("#target-word-text-" + i).style("text-decoration", "none");
-                that.addEvent("target-hover-out", d);
-                svg.selectAll('.attention-selected').classed("attention-selected", false);
-                that.updateAttentionViewWeights(attention, svg);
-                svg.selectAll(".source-word-text").style("font-weight", "normal");
-                svg.selectAll(".source-word-text").style("text-decoration", "none");
+                that.attentionMouseOut(d, i, attention);
             });
 
         targetEnter.append("g")
@@ -465,10 +805,6 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 return "translate(" + x + "," + y + ")";
             })
             .append("text")
-            .attr("transform", function (d) {
-                var xScale = 1;
-                return "scale(" + xScale + ",1)"
-            })
             .classed("target-word-text", true)
             .attr("id", function (d, i) {
                 return "target-word-text-" + i;
@@ -482,12 +818,6 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             .style("text-anchor", "middle");
 
         var tr = svg.append('g').selectAll('g').data(attention).enter().append("g");
-
-        tr.each(function (d, i) {
-            if (!d) {
-                return;
-            }
-        })
 
         var j = -1;
         tr.selectAll('path').data(function (d) {
@@ -528,7 +858,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 return attentionScale(d) + "px";
             })
             .style("visibility", function (d, i) {
-                return d < that.ATTENTION_THRESHOLD ? "hidden" : "visible";
+                return d < that.attentionThreshold ? "hidden" : "visible";
             });
 
         that.updateAttentionViewWeights(attention, svg);
@@ -546,11 +876,13 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             }
             max = Math.max(max, Math.abs(sum));
             svg.select("#source-word-box-" + j).style("opacity", sum);
+            svg.select("#source-word-box-matrix-" + j).style("opacity", sum);
         }
 
         if (m == 0) {
             for (var j = 0; j < this.beamAttention.length; j++) {
                  svg.select("#target-word-box-" + j).style("opacity", 0);
+                 svg.select("#target-word-box-matrix-" + j).style("opacity", 0);
             }
         }
         max = 0;
@@ -561,6 +893,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             }
             max = Math.max(max, Math.abs(sum));
             svg.select("#target-word-box-" + k).style("opacity", sum);
+            svg.select("#target-word-box-matrix-" + k).style("opacity", sum);
         }
     }
 
@@ -597,7 +930,9 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             timeSpent: 0,
         };
         this.events = [];
-        this.documentService.retranslateSentence(this.documentId, this.sentenceId, this.beamSize).subscribe(res => {
+
+
+        this.documentService.retranslateSentence(this.documentId, this.sentenceId, this.beamSize, Number(this.attLayer)).subscribe(res => {
             this.documentService.getSentence(this.documentId, this.sentenceId)
                             .subscribe((sentence: any) => {
                                 this.sentence = sentence.inputSentence.split(" ");
@@ -606,8 +941,13 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                                 this.translation = sentence.translation.split(" ");
                                 this.attention = sentence.attention;
                                 this.documentUnkMap = sentence.document_unk_map;
-                                this.updateTranslation(sentence.inputSentence, sentence.translation);
+                                this.prev_beam_size = this.beamSize;
+                                this.prev_attLayer = this.attLayer
+                                this.prev_attentionThreshold = this.attentionThreshold
+
                                 this.updateBeamGraph(sentence.beam, true);
+                                this.updateAttentionMatrix(sentence.inputSentence, sentence.translation);
+                                this.updateTranslation(sentence.inputSentence, sentence.translation);
                     });
                 });
     }
@@ -619,6 +959,10 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             timeSpent: 0,
         };
         this.events = [];
+        this.beamSize = this.prev_beam_size
+        this.attLayer = this.prev_attLayer
+        this.attentionThreshold = this.prev_attentionThreshold
+
         this.documentService.getSentence(this.documentId, this.sentenceId)
             .subscribe((sentence: any) => {
                 this.sentence = sentence.inputSentence.split(" ");
@@ -627,8 +971,11 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
                 this.translation = sentence.translation.split(" ");
                 this.attention = sentence.attention;
                 this.documentUnkMap = sentence.document_unk_map;
-                this.updateTranslation(sentence.inputSentence, sentence.translation);
+
                 this.updateBeamGraph(sentence.beam, true);
+                this.updateAttentionMatrix(sentence.inputSentence, sentence.translation);
+                this.updateTranslation(sentence.inputSentence, sentence.translation);
+
             });
     }
 
@@ -671,6 +1018,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
         this.http.post(this.baseUrl, {
             sentence: this.encodeText(this.inputSentence),
             beam_size: this.beamSize,
+            attLayer : Number(this.attLayer),
             beam_length: this.beamLength,
             beam_coverage: this.beamCoverage,
         }).subscribe(data => {
@@ -681,6 +1029,7 @@ export class SentenceViewComponent implements OnInit, AfterContentInit {
             this.loading = false;
             this.haveContent = true;
             this.updateBeamGraph(data["beam"]);
+            this.updateAttentionMatrix(data["sentence"], data["translation"]);
             this.updateTranslation(data["sentence"], data["translation"]);
         });
     }

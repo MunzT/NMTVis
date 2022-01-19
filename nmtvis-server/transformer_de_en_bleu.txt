@@ -1,0 +1,248 @@
+Loading vocab...
+Loading vocab...
+Loading data...
+Loaded 2999 sentences
+Loading model and Trainer...
+LOADING
+Starting test...
+---------------- TRANSLATION 50 ----------------
+She and her mother were absolutely best friends.
+She and her mother were absolutely best friends.
+
+---------------- TRANSLATION 100 ----------------
+It is, of course, too early in the parliamentary term.
+Of course, it's still early in the election cycle.
+
+---------------- TRANSLATION 150 ----------------
+Donald Trump and Ben Carson now account for about half of the support of Republican voters, especially their outsider status.
+Donald Trump and Ben Carson now account for roughly half of the support from Republican voters, largely due to their outsider status.
+
+---------------- TRANSLATION 200 ----------------
+This is evident from the long-term study carried out by an international research team, including several employees of the German Institute for Food Research (DIfE) in Potsdam.
+This emerges from a long-term study by an international team of researchers, including a number of employees of the German Institute for Nutritional Research (DIfE) in Potsdam.
+
+---------------- TRANSLATION 250 ----------------
+German Secretary of State Matthias Machnig (SPD), on the other hand, described the plans as major progress.
+The German Secretary of State for the Economy, Matthias Machnig (SPD), on the other hand, referred to the plans as major progress.
+
+---------------- TRANSLATION 300 ----------------
+Mr Corbyn said to the TUC conference that Labour is making changes to remove the whole idea of a limit.
+Mr Corbyn told the TUC conference Labour was putting forward amendments to remove the whole idea of a cap altogether.
+
+---------------- TRANSLATION 350 ----------------
+Richemonts latest sales hit all expectations and also showed that sales in China - a key market for Burberry - are returning to growth.
+Richemont's latest sales figures beat expectations and also showed that sales in China - a key market for Burberry - had begun to grow again.
+
+---------------- TRANSLATION 400 ----------------
+Culinary understanding is also very important for its customers.
+Customers also appreciate this international culinary understanding.
+
+---------------- TRANSLATION 450 ----------------
+The emergency situation in two southern regions that was declared on Tuesday gave authorities greater powers to deal with the crisis, so that they could close down roads and speed up asylum procedures.
+Tuesday's state of emergency in two southern regions gave authorities greater powers to deal with the crisis, allowing them to shut down roads and speed up asylum court cases.
+
+---------------- TRANSLATION 500 ----------------
+In all these measurements, about a quarter of the democratic voters have no opinion of Sanders.
+On all of these measures, about a quarter of Democratic voters do not have an opinion of Sanders.
+
+---------------- TRANSLATION 550 ----------------
+This will happen when the Fed raises interest rates.
+Here's what will happen when the Fed raises interest rates
+
+---------------- TRANSLATION 600 ----------------
+He argues that it is increasingly inseparable from commercial rivals.
+Argues it's becoming increasingly indistinguishable from commercial rival
+
+---------------- TRANSLATION 650 ----------------
+Mr Akram and his parents were in the Great Mosque before the start of the annual Haddsch.
+Mr Akram had been in the Grand Mosque with his parents ahead of the start of the annual hajj pilgrimage.
+
+---------------- TRANSLATION 700 ----------------
+In order to expose the infidelity, the defence stated that the club had never created an asset disadvantage.
+On the charge of breach of trust, the defence argued that the club had never at any time suffered any pecuniary disadvantage
+
+---------------- TRANSLATION 750 ----------------
+Whitmans restructuring plans provide for the overall reduction of some 55,000 jobs.
+Whitman's plans for restructuring include around 55,000 job losses.
+
+---------------- TRANSLATION 800 ----------------
+Prentiss was described as a "good man" by Shawn O'Steen, who said that they were married for about seven years.
+Prentiss was described as a "good person" by Shawn O'Steen, who said he had been married to her for about seven years.
+
+---------------- TRANSLATION 850 ----------------
+Moreno seemed happy to have escaped a Red Card and the imposition of an Elfmeter.
+Moreno appeared fortunate to escape a red card and the concession of a spot-kick.
+
+---------------- TRANSLATION 900 ----------------
+I do not see why a drummer cannot beat there, and this left-handed has already shown that he is a vicious circle of cricket players.
+I don't see why a strokemaker cannot bat there and this left-hander has already shown he is one hell of a cricketer.
+
+---------------- TRANSLATION 950 ----------------
+It is right not to give Cameron a free ticket for Europe that allows him to consider Labours support in the referendum campaign to be self-evident, as McDonnell said.
+It's fair enough not to give Cameron a free pass on Europe, allowing him to take Labour's support for granted in the referendum campaign, as McDonnell has said.
+
+---------------- TRANSLATION 1000 ----------------
+On the radio fee, Johnson said to the committee: 'I call on you to find a rather regressive system with regard to the conditions under which the best value can be obtained from it.
+On the licence fee, Johnson told the committee: "I challenge you to find a more regressive system in terms of who gets the best value from it.
+
+---------------- TRANSLATION 1050 ----------------
+This includes a "uniquely shaped battlefield head that provides outstanding effect effects inside the target."
+This includes a "unique shaped-charge warhead that delivers outstanding behind-armour-effects inside the target."
+
+---------------- TRANSLATION 1100 ----------------
+The entrepreneur Markus Gildner believes that he knows how quickly to create favorable housing: he is building Reihenhäuser for refugees in a project.
+Entrepreneur Marcus Gildner believes he knows how quickly economical housing can be developed: with this project he is building terraced houses for refugees.
+
+---------------- TRANSLATION 1150 ----------------
+53 points divide the Vice World Champion from Title Defender and Two Champion Hamilton before the Singapore race this Sunday.
+Before the night race in Singapore this Sunday, 53 points divide the vice world champion from the titleholder and two times champion Hamilton.
+
+---------------- TRANSLATION 1200 ----------------
+From 1972 to 1983 he was President of the Austrian Institute of Formation.
+From 1972 to 1983 he was President of the Austrian Institute for Design.
+
+---------------- TRANSLATION 1250 ----------------
+From 19 September the practice will be prepared for the new boss.
+From 19 September the practice will be preparing for the new boss.
+
+---------------- TRANSLATION 1300 ----------------
+Croatia: 'Comprehensive possibilities for border control'
+Croatia: "Widespread options for border control"
+
+---------------- TRANSLATION 1350 ----------------
+Every two years training courses are offered for new employees.
+Training for new staff is offered every two years.
+
+---------------- TRANSLATION 1400 ----------------
+The Dow Jones Industrial average fell by more than 16% in May, when investors feared that a slowdown in Chinas economy would reduce global growth.
+The Dow Jones industrial average dropped as much as 16% below its record high in May as investors feared a slowing Chinese economy would drag down global growth.
+
+---------------- TRANSLATION 1450 ----------------
+Every Thursday it does so in the asylum seekers' home on Dillinger Street.
+Every Thursday she goes to the refugee centre on Dillinger Strasse.
+
+---------------- TRANSLATION 1500 ----------------
+He was asked by Schongauer colleagues to take over the post of medical director.
+He was asked by his colleagues at Schongau to take over the post of medical director.
+
+---------------- TRANSLATION 1550 ----------------
+The support programme for refugee accommodation at the State Bank KfW is already well received by cities and municipalities.
+The KfW state bank's refugee funding programme has already been well received in towns and local authorities.
+
+---------------- TRANSLATION 1600 ----------------
+"After the bridge festival on Sunday we were busy clearing up when ten people suddenly stood at the entrance of the tent with travel bags," says Wernstein's Mayor Alois Stadler.
+"We were busy cleaning up after the Bridge Festival on Sunday, when suddenly there were ten people standing at the entrance to the tent with suitcases," says Mayor of Wernstein Alois Stadler.
+
+---------------- TRANSLATION 1650 ----------------
+Linz calls for a better distribution
+Linz demanding a better allocation
+
+---------------- TRANSLATION 1700 ----------------
+And what do the villagers think about his goal of becoming the most powerful man in the world?
+And what do the inhabitants of the village think about his ambition to become the most powerful man in the world?
+
+---------------- TRANSLATION 1750 ----------------
+The new drama about a recently forgotten father who decides to settle with his two children on the coast of New Zealand reached a very impressive figure of 1.219 million spectators.
+The new drama, about a recently widowed father who decides to relocate to seaside New Zealand with his two children, averaged a very impressive 1.219 million viewers.
+
+---------------- TRANSLATION 1800 ----------------
+Hayne posed for a photo with fans, holding an Australian flag after the game and posting it on his instagram.
+Hayne posed for a photo with fans holding an Australian flag after the game and posted it to his Instagram.
+
+---------------- TRANSLATION 1850 ----------------
+The dollar thus cost EUR 0.8846 (0.8875).
+This means that the dollar cost €0.8846 (0.8875).
+
+---------------- TRANSLATION 1900 ----------------
+NHC predicts 60% chance for cyclone south of Cape Verde.
+NHC says 60 percent chance of cyclone south of Cape Verde Islands
+
+---------------- TRANSLATION 1950 ----------------
+'It is impossible for everyone to come to Europe '- Dalai Lama - RT-News
+"It is impossible for everyone to come to Europe" - Dalai Lama - RT News
+
+---------------- TRANSLATION 2000 ----------------
+Griffiths plays down the talk of Disharmony at Celtic Glasgow, Deila admits that the hosts are in a bad place, but that he will turn that back.
+Griffiths plays down talk of disharmony at Celtic as Deila admits Hoops are in a bad place but he'll turn it around.
+
+---------------- TRANSLATION 2050 ----------------
+In the meantime, employment in Scotland has fallen by 12,000 over the three months, with the number of employees now at 2,612,000.
+Meanwhile, employment in Scotland fell by 12,000 during the three month period, with the number of those in work now standing at 2,612,000.
+
+---------------- TRANSLATION 2100 ----------------
+What you will get from me is what it means to see a man die unnecessarily.
+What you will get from me is what it's like to watch a man I like die an unnecessary death.
+
+---------------- TRANSLATION 2150 ----------------
+People who lay down these rules know nothing about the horse.
+People making these rules know nothing about the horse.
+
+---------------- TRANSLATION 2200 ----------------
+Two of the three lorries involved had braked in front of a permanent construction site in the direction of Basel.
+Two of the three lorries involved had braked approaching long-term roadworks in the direction of Basel.
+
+---------------- TRANSLATION 2250 ----------------
+It is at the heart of the brand.
+It is at the heart of the brand.
+
+---------------- TRANSLATION 2300 ----------------
+According to forecasts by the Federal Ministry of the Interior, around 800 000 asylum seekers will come to Germany this year, according to Vice-Chancellor Sigmar Gabriel (SPD), Germany is even able to receive one million refugees.
+According to the predictions of the Federal Minister of the Interior, around 800,000 asylum seekers will arrive in Germany this year, and according to a statement by Vice Chancellor Sigmar Gabriel (SPD), Germany is actually in a position to take in a million refugees.
+
+---------------- TRANSLATION 2350 ----------------
+But additional money must go into the system.
+However extra money must be added to the system for this.
+
+---------------- TRANSLATION 2400 ----------------
+Stephanie Probst also says: "If our animals are not doing well, we are not doing well either".
+Stephanie Probst has her own answer to this: "If our animals aren't happy, then nor are we".
+
+---------------- TRANSLATION 2450 ----------------
+Wenger accepts the potential of a vicious circle, but Arsenal believes that an improvement in the injury rate during the last season will continue.
+Wenger accepts the potential of a vicious circle but Arsenal believe that an improvement in their injury record during last season will continue.
+
+---------------- TRANSLATION 2500 ----------------
+"It is not easy to win at home or abroad in the Champions League, so it is a good start to win 2:0, to cause problems for our opponents and to look back relaxed, even if there are certain things we still have to perfect during the season," Blanc said.
+"It's not easy to win at home or away in the Champions League, so to win 2-0, cause our opponents problems and look comfortable at the back is a good start even if there are certain things we will need to perfect as the season goes on," said Blanc.
+
+---------------- TRANSLATION 2550 ----------------
+Eight times Spanish champions, three times podium winner, four times Champions-League-winner, two times club World Champion, two times European Champion, once World Champion - the title list of Xavi is breathtaking.
+Eight times Spanish champion, three times cup winner, four times Champions League winner, twice club world champion, twice European champion, one time world champion - Xavi's list of titles is breath-taking.
+
+---------------- TRANSLATION 2600 ----------------
+How much money is a wonderful price and changes life, it gets the great free.
+As much as the money is a wonderful prize and life changing, he does get the great gratification.
+
+---------------- TRANSLATION 2650 ----------------
+He has been missing since August 20 because of a distortion in the right hip joints.
+He has been out since Aug. 20 with a strained right oblique.
+
+---------------- TRANSLATION 2700 ----------------
+So the moon is easily swinging around the ring planets on its course.
+This is the reason the moon wobbles slightly in its orbit of the ringed planet.
+
+---------------- TRANSLATION 2750 ----------------
+In total, over 48 hours south of the Alps, some over 100 litres of rain per square metre will have to be expected, after large amounts of rain have already fallen in recent days.
+Over the next 48 hours the south of the Alps can expect over 100 litres of rain per square metre in places, following on from a large volume of rain which has fallen over the last few days.
+
+---------------- TRANSLATION 2800 ----------------
+Plans made, places found, companies commissioned, ground hills modeled for a circular course: one year later almost everything was finished - but before the official opening of the BMX railway it was already over.
+Plans made, site found, company commissioned, mound for a circuit modelled: one year later, everything was nearly finished - but even before the official opening of the BMX track it was closed again.
+
+---------------- TRANSLATION 2850 ----------------
+At Borussia Dortmund, all hopes for a comeback by Marco Reus have finally vanished in the first European League match.
+All hopes have been crushed for Borussia Dortmund that Marco Reus might make a comeback in the first group match of the European league.
+
+---------------- TRANSLATION 2900 ----------------
+In the Champions-League-game at the PSV Eindhoven, the defender was hit by a tackling by Héctor Moreno and replaced after long treatment.
+In the course of the tackle in the Champions League game with PSV Eindhoven, the defender was hit by Héctor Moreno and after a long bout of treatment was replaced.
+
+---------------- TRANSLATION 2950 ----------------
+In order to counter competition from Asia, we need to find high-quality and innovative products.
+In order to face the competition from the Asian regions one has to find high-quality and innovative products.
+
+
+
+
+########################################
+BLEU SCORE de-en 36.37578882439986

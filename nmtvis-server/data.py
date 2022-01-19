@@ -16,12 +16,21 @@ tokenizer_fun = lambda s: s.split()
 SRC = data.Field(pad_token=BLANK_WORD, batch_first=True, tokenize=tokenizer_fun)
 TGT = data.Field(init_token = BOS_WORD, eos_token = EOS_WORD, pad_token=BLANK_WORD, batch_first=True, tokenize=tokenizer_fun)
 
-def load_dataset(src_lang: str, tgt_lang: str, min_length: int = 0):
+def load_dataset(src_lang: str, tgt_lang: str, min_length: int = 0, only_val: bool = False):
     print("Loading dataset...")
-    train, val, test = datasets.WMT14.splits(root=os.path.abspath(os.path.join(shared.DATA_FOLDER)),
+    if only_val:
+        train = None
+        test = None
+        val = datasets.WMT14.splits(root=os.path.abspath(os.path.join(shared.DATA_FOLDER)),
                             exts=(f'.{src_lang}', f'.{tgt_lang}'), fields=(SRC, TGT),
+                            train=None, test=None,
                             filter_pred=lambda x: len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN and
-                                                  len(vars(x)['src']) >= min_length and len(vars(x)['trg']) >= min_length)
+                                                  len(vars(x)['src']) >= min_length and len(vars(x)['trg']) >= min_length)[0]
+    else:
+        train, val, test = datasets.WMT14.splits(root=os.path.abspath(os.path.join(shared.DATA_FOLDER)),
+                                exts=(f'.{src_lang}', f'.{tgt_lang}'), fields=(SRC, TGT),
+                                filter_pred=lambda x: len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN and
+                                                    len(vars(x)['src']) >= min_length and len(vars(x)['trg']) >= min_length)
     return train, val, test
 
 

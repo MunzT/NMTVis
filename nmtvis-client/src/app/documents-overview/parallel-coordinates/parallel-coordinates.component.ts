@@ -88,7 +88,7 @@ export class ParallelCoordinatesComponent implements OnInit, AfterViewInit, OnCh
             this.updateSentences(sentences.currentValue);
             this.setDefaultBrush();
         }
-        if (changes.selectedSentence) {
+        if (changes.selectedSentence && changes.selectedSentence.currentValue) {
             d3.select('.selected-line').classed('selected-line', false);
             let id = changes.selectedSentence.currentValue.id;
             var el: any = d3.select('#line-' + id).classed("selected-line", true);

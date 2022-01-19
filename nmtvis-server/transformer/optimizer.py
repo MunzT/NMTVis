@@ -1,6 +1,6 @@
 import torch
 from torch.optim import Adam
-from torch.optim.lr_scheduler import _LRScheduler
+
 
 class Optimizer(Adam):
     def __init__(self, parameters, lr=0, betas=(0.9, 0.98), eps=1e-9, d_model: int = 512, factor: float = 1.0, warmup_steps: int = 16000):
@@ -25,6 +25,16 @@ class Optimizer(Adam):
         # forward step call to real optimizer
         super().step(closure=closure)
 
+    
+    @torch.no_grad()
+    def constant_step(self, closure=None):
+        # use current lr for step, no decrease
+        for param in self.param_groups:
+            param['lr'] = self.my_lr
+
+        # forward step call to real optimizer
+        super().step(closure=closure)
+
 
     def state_dict(self):
         super_dict = super().state_dict()
@@ -36,6 +46,7 @@ class Optimizer(Adam):
 
 
     def load_state_dict(self, state_dict):
+        print("Restoring optimizer state...")
         self.my_step_num = state_dict['my_step_num']
         self.my_lr = state_dict['my_lr']
         self.my_factor = state_dict['my_factor']
@@ -45,3 +56,4 @@ class Optimizer(Adam):
         del state_dict["my_factor"]
         del state_dict["my_warmup_steps"]
         super().load_state_dict(state_dict)
+        print("Optimizer state restored!")

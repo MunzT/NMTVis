@@ -98,34 +98,36 @@
         </div>
         </div>
 
-        <div id="translation-box" style="display: inline-block;width: overflow-x: auto;">
-
-        </div>
-        <div *ngIf="debug" style="display: inline-block; font-size:10px; max-width: 270px;">
-            <h3>Time: {{ timeSpent }} s | Clicks: {{ clicks }} | Hovers: {{ hovers }} | Corrections: {{
-                corrections }}</h3>
-            <div *ngIf="objectKey(unkMap).length > 0">
-                <h3>UNK Map</h3>
-                <div *ngFor="let partial of objectKey(unkMap)">
-                    <span style="float: left;">{{ partial + ':'}}</span>
-                    <span style="font-weight: bold">{{ unkMap[partial] }}</span>
+        <div id="attention_vis" style="display: inline-block;width: overflow-x: auto;">
+            <div id="translation-box" style="display: inline-block;width: overflow-x: auto;"></div>
+            <div *ngIf="debug" style="display: inline-block; font-size:10px; max-width: 270px;">
+                <h3>Time: {{ timeSpent }} s | Clicks: {{ clicks }} | Hovers: {{ hovers }} | Corrections: {{
+                    corrections }}</h3>
+                <div *ngIf="objectKey(unkMap).length > 0">
+                    <h3>UNK Map</h3>
+                    <div *ngFor="let partial of objectKey(unkMap)">
+                        <span style="float: left;">{{ partial + ':'}}</span>
+                        <span style="font-weight: bold">{{ unkMap[partial] }}</span>
+                    </div>
                 </div>
-            </div>
-            <div *ngIf="objectKey(correctionMap).length > 0">
-                <h3>Correction Map</h3>
-                <div *ngFor="let partial of objectKey(correctionMap)">
-                    <span style="float: left">{{ partial + ':'}}</span>
-                    <span style="font-weight: bold">{{ correctionMap[partial] }}</span>
+                <div *ngIf="objectKey(correctionMap).length > 0">
+                    <h3>Correction Map</h3>
+                    <div *ngFor="let partial of objectKey(correctionMap)">
+                        <span style="float: left">{{ partial + ':'}}</span>
+                        <span style="font-weight: bold">{{ correctionMap[partial] }}</span>
+                    </div>
                 </div>
-            </div>
-            <div *ngIf="objectKey(documentUnkMap).length > 0">
-                <h3>Document UNK Map</h3>
-                <div *ngFor="let partial of objectKey(documentUnkMap)">
-                    <span style="float: left">{{ partial + ':'}}</span>
-                    <span *ngFor="let word of documentUnkMap[partial]" style="font-weight: bold">
-                    {{ word + ' | '}}
-                </span>
+                <div *ngIf="objectKey(documentUnkMap).length > 0">
+                    <h3>Document UNK Map</h3>
+                    <div *ngFor="let partial of objectKey(documentUnkMap)">
+                        <span style="float: left">{{ partial + ':'}}</span>
+                        <span *ngFor="let word of documentUnkMap[partial]" style="font-weight: bold">
+                        {{ word + ' | '}}
+                    </span>
+                    </div>
                 </div>
+              </div>
+              <div *ngIf="showAttentionMatrix" id="attention-matrix">
             </div>
         </div>
 
@@ -149,11 +151,31 @@
                 </svg>
                 <div style="margin-top: -30px;">
                     <form class="example-form">
-                        <span style="font-weight: bold; font-size: 13px; margin-bottom: 60px;">Number of translations:</span>
+                        <span style="font-weight: bold; font-size: 13px; margin-bottom: 60px;">Attention Threshold in Attention View:</span>
+                        <mat-form-field style="width: 50px;height: 20px;">
+                            <input matInput [(ngModel)]="attentionThreshold" (change)="attentionThresholdChange()" type="number"
+                                   name="attentionThreshold"
+                                   min="0"
+                                   max="1"
+                                   step="0.05"
+                                   placeholder=""
+                                   style="text-align:center;">
+                        </mat-form-field>
+
+                        <span style="margin: 50px; font-weight: bold; font-size: 13px; margin-bottom: 60px;">  |  </span>
+                        <mat-checkbox style="width: 50px;height: 20px;" [(ngModel)]="showMatrix" (change)="showMatrixChanged()"
+                                      name="showMatrix"
+                                      value="false"
+                                      style="text-align:center;">
+                        </mat-checkbox>
+                        <span style="font-weight: bold; font-size: 13px; margin-bottom: 60px;">Show Matrix View</span>
+
+                        <span style="margin: 50px; font-weight: bold; font-size: 13px; margin-bottom: 60px;">  |  </span>
+                        <span style="font-weight: bold; font-size: 13px; margin-bottom: 60px;">Number of Translations in Beam Search:</span>
                         <mat-form-field style="width: 50px;height: 20px;">
                             <input matInput [(ngModel)]="beamSize" (change)="beamSizeChange()" type="number"
                                    name="beamSize"
-                                   value="3" min="1"
+                                   min="1"
                                    max="10"
                                    placeholder=""
                                    style="text-align:center;">
@@ -162,7 +184,8 @@
                         <mat-form-field *ngIf="false" style="width: 50px; height: 20px;">
                             <input matInput [(ngModel)]="beamLength" (change)="beamSizeChange()" type="number"
                                    name="beamLength"
-                                   value="0.5" min="0"
+                                   value="0.5"
+                                   min="0"
                                    max="1"
                                    step="0.1"
                                    placeholder=""
@@ -193,6 +216,16 @@
                                 </mat-icon>
                             </button>
                         </div>
+
+                        <span *ngIf="showLayeroptions" style="margin: 50px; font-weight: bold; font-size: 13px; margin-bottom: 60px;"> | </span>
+                        <span *ngIf="showLayeroptions" style="font-weight: bold; font-size: 13px; margin-bottom: 60px;">Attention Layer(s): </span>
+                        <mat-form-field *ngIf="showLayeroptions" style="width: 100px;height: 20px;">
+                            <mat-select [(ngModel)]="attLayer" (selectionChange)="layerChange()" name="attLayer">
+                                <mat-option *ngFor="let layers of layerOptions"  [value]="layers">
+                                    {{layers}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
                     </form>
                 </div>
             </div>

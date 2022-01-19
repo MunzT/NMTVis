@@ -1,8 +1,9 @@
 # For data loading
 import logging
 import os
-import pytorch_lightning as pl
 import time
+
+import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -25,7 +26,7 @@ class PeriodicCheckpoint(Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
         if time.time() - self.last_ckpt_time >= self.save_every_minutes * 60:
             print("SAVE")
-            trainer.save_checkpoint(f'.data/models/transformer_small/{self.src_lang}_{self.tgt_lang}_{self.counter}.pt')
+            trainer.save_checkpoint(f'.data/models/{self.src_lang}_{self.tgt_lang}_{self.counter}.pt')
             self.last_ckpt_time = time.time()
             self.counter += 1
 
@@ -74,12 +75,15 @@ if __name__ == "__main__":
     if CONTINUE_TRAINING_CKPT >= 0:
         ckpt = os.path.join(MODELS_FOLDER, 'transformer', f'trafo_{SRC_LANG}_{TGT_LANG}_{CONTINUE_TRAINING_CKPT}.pt')
         trainer = pl.Trainer(gpus=torch.cuda.device_count(), accumulate_grad_batches=2,
-                        callbacks=[PeriodicCheckpoint(EPOCH_TIME_MINUTES, SRC_LANG, TGT_LANG, resume_from_ckpt=CONTINUE_TRAINING_CKPT), lr_logger],
+                        callbacks=[PeriodicCheckpoint(EPOCH_TIME_MINUTES, SRC_LANG, TGT_LANG,
+                                                      resume_from_ckpt=CONTINUE_TRAINING_CKPT), lr_logger],
                         checkpoint_callback=False, max_steps=STEPS, logger=logger, accelerator='ddp',
-                        resume_from_checkpoint=ckpt, val_check_interval=15000, log_every_n_steps=100, progress_bar_refresh_rate=1000)
+                        resume_from_checkpoint=ckpt, val_check_interval=15000, log_every_n_steps=100,
+                             progress_bar_refresh_rate=1000)
     else:
         trainer = pl.Trainer(gpus=torch.cuda.device_count(), accumulate_grad_batches=2,
                         callbacks=[PeriodicCheckpoint(EPOCH_TIME_MINUTES, SRC_LANG, TGT_LANG), lr_logger],
-                        checkpoint_callback=False, max_steps=STEPS, logger=logger, accelerator='ddp', val_check_interval=15000, log_every_n_steps=100, progress_bar_refresh_rate=1000)
+                        checkpoint_callback=False, max_steps=STEPS, logger=logger, accelerator='ddp',
+                             val_check_interval=15000, log_every_n_steps=100, progress_bar_refresh_rate=1000)
 
     trainer.fit(model, dm)

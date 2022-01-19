@@ -1,0 +1,11 @@
+nmtvis-server/.data/documents
+nmtvis-server/.data/wmt14
+*.db
+nmtvis-server/.data/uploads/*.txt
+*.pkl
+*.pt
+__pycache__
+.vscode
+.DS_Store
+nmtvisenv
+events.out.tfevents.*

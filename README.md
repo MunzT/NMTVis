@@ -1,6 +1,8 @@
 # NMTVis
 
 [![Identifier](https://img.shields.io/badge/doi-10.18419%2Fdarus--1849-d45815.svg)](https://doi.org/10.18419/darus-1849)
+[![Identifier](https://img.shields.io/badge/doi-10.18419%2Fdarus--1850-d45815.svg)](https://doi.org/10.18419/darus-1850)
+[![Identifier](https://img.shields.io/badge/doi-10.18419%2Fdarus--2124-d45815.svg)](https://doi.org/10.18419/darus-2124)
 
 ![NMTVis](application.png)
 
@@ -10,6 +12,7 @@ Our system supports translation with an LSTM-based and the Transformer architect
 It provides a web interface for visualizations and to support interactive correction.
 
 You can find an introduction to our system [here](INTRO.md).
+If you want to reproduce our evaluation you can follow the steps [here](EVALUATION.md).
 
 ## Starting NMTVis
 
@@ -52,22 +55,9 @@ Alternatively, you can train the models yourself, however, training will take se
 
 ### For the server:
 
-First, install all python requirements (we used Python 3.8) for the server (in the *nmtvis-server/* directory ):
+First, install all python requirements (we used Python 3.8 and 3.9) for the server (in the *nmtvis-server/* directory ):
 ```bash
 pip3 install -r requirements.txt
-python -m spacy download en_core_web_sm
-python -m spacy download de_core_news_sm
-```
-
-On Windows, you can install [pytorch](https://pytorch.org/get-started/locally/) like this:
-
-Without CUDA:
-```bash
-pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-```
-or with CUDA:
-```bash
-pip install torch===1.4.0 torchvision===0.5.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ### For the client:
@@ -111,15 +101,33 @@ Our project is licensed under the [MIT License](LICENSE.md).
 
 ## Citation
 
-When referencing our work, please cite the paper *Visual-Interactive Neural Machine Translation*:
+When referencing our work, please cite the journal paper *Visualization-Based Improvement of Neural Machine Translation* or conference paper *Visual-Interactive Neural Machine Translation*:
 
-T. Munz, D. Väth, P. Kuznecov, N. T. Vu, and D. Weiskopf. Visual-Interactive Neural Machine Translation. Graphics Interface 2021. 2021. 
+T. Munz, D. Väth, P. Kuznecov, N. T. Vu, and D. Weiskopf. Visualization-based improvement of neural machine translation. Computers Graphics, 2021.
+
+```
+@article{nmt2021_2,
+  title = {Visualization-based improvement of neural machine translation},
+  journal = {Computers & Graphics},
+  year = {2021},
+  doi = {10.1016/j.cag.2021.12.003},
+  author = {Tanja Munz and Dirk Väth and Paul Kuznecov and Ngoc Thang Vu and Daniel Weiskopf},}
+```
+
+T. Munz, D. Väth, P. Kuznecov, N. T. Vu, and D. Weiskopf. Visual-interactive neural machine translation. In Proceedings of Graphics Interface 2021, GI 2021, pages 265 – 274. Canadian Information Processing Society, 2021.
 
 ```
 @inproceedings{nmt2021,
-  author    = {Munz, Tanja and Väth, Dirk and Kuznecov, Paul and Vu, Ngoc Thang and Weiskopf, Daniel},
-  title     = {Visual-Interactive Neural Machine Translation},
-  booktitle = {Graphics Interface 2021},
-  year      = {2021},
+  author = {Munz, Tanja and Väth, Dirk and Kuznecov, Paul and Vu, Ngoc Thang and Weiskopf, Daniel},
+  title = {Visual-Interactive Neural Machine Translation},
+  booktitle = {Proceedings of Graphics Interface 2021},
+  series = {GI 2021},
+  year = {2021},
+  isbn = {978-0-9947868-6-9},
+  location = {Virtual Event},
+  pages = {265 -- 274},
+  numpages = {10},
+  doi = {10.20380/GI2021.30},
+  publisher = {Canadian Information Processing Society},
 }
 ```

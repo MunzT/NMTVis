@@ -2,24 +2,18 @@ import argparse
 import json
 import os
 import pickle
-import random
+from hashlib import md5
+from uuid import uuid4
+
 import spacy
-import subprocess
-import sys
-import torch
-import torchtext.data
-import torchtext.datasets
-from flask import Flask, jsonify, request, send_file, redirect, url_for, Response
+from flask import Flask, jsonify, request, redirect
 from flask_compress import Compress
 from flask_cors import CORS
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
-from flask_sqlalchemy import SQLAlchemy
-from hashlib import md5
 from simplediff import html_diff
-from uuid import uuid4
 from werkzeug.utils import secure_filename
 
 import data
@@ -28,7 +22,7 @@ from db_models import User, Document as DBDocument
 from document import Document, Sentence
 from keyphrase_extractor import DomainSpecificExtractor
 from scorer import Scorer
-from shared import db, DOCUMENTS_FOLDER, DATA_FOLDER, UPLOAD_FOLDER, DB_PATH, ALLOWED_EXTENSIONS, \
+from shared import db, DOCUMENTS_FOLDER, UPLOAD_FOLDER, DB_PATH, ALLOWED_EXTENSIONS, \
     EXPORT_TRANSLATIONS_FOLDER
 
 
@@ -131,10 +125,6 @@ def addTranslation(root, translation):
         if child["name"] == translation.words[0]:
             addTranslation(child, translation.slice())
             return
-
-    # print("--------")
-    # print("add trans", len(translation.words), len(translation.attns), len(translation.log_probs))
-    # print(translation.words)
 
     attn = translation.attns[0] if len(translation.attns) > 0 else []
     node = {"name": translation.words[0],
@@ -285,7 +275,8 @@ def getTranslationData(document_id, sentence_id):
 
     translation, attn, beam = sentence.translation, sentence.attention, sentence.beam
     document_map = {"inputSentence": sentence.source, "translation": translation, "attention": attn,
-                    "beam": beam, "document_unk_map": document.unk_map}
+                    "beam": beam, "document_unk_map": document.unk_map,
+                    "model": 'seq' if 'seq' in model_name else 'trafo'}
     return jsonify(document_map)
 
 
@@ -357,8 +348,9 @@ def documentUpload():
         print("Translating {} sentences".format(len(sentences)))
 
         beamSize = 3
+        attLayer = -2
         for i, source in enumerate(sentences):
-            translation, attn, translations = model.translate(source, beam_size=beamSize, beam_length=0.6,
+            translation, attn, translations = model.translate(source, beam_size=beamSize,  attLayer=attLayer, beam_length=0.6,
                                                                       beam_coverage=0.4)
             print("Translated {} of {}".format(i + 1, len(sentences)))
 
@@ -390,6 +382,7 @@ def beamUpdate():
     data = request.get_json()
     sentence = data["sentence"]
     beam_size = int(data["beam_size"])
+    attLayer = None if data["attLayer"] is None else int(data["attLayer"])
     beam_length = float(data["beam_length"])
     beam_coverage = float(data["beam_coverage"])
     attentionOverrideMap = data["attentionOverrideMap"]
@@ -397,6 +390,33 @@ def beamUpdate():
     unk_map = data["unk_map"]
 
     translation, attn, translations = model.translate(sentence, beam_size,
+                                                              attLayer = attLayer,
+                                                              beam_length=beam_length,
+                                                              beam_coverage=beam_coverage,
+                                                              attention_override_map=attentionOverrideMap,
+                                                              correction_map=correctionMap, unk_map=unk_map)
+    beam = translationsToTree(translations)
+    res = {}
+    res["beam"] = beam
+
+    return jsonify(res)
+
+
+@app.route("/layerUpdate", methods=['POST'])
+@jwt_required
+def layerUpdate():
+    data = request.get_json()
+    sentence = data["sentence"]
+    beam_size = int(data["beam_size"])
+    attLayer = None if data["attLayer"] is None else int(data["attLayer"])
+    beam_length = float(data["beam_length"])
+    beam_coverage = float(data["beam_coverage"])
+    attentionOverrideMap = data["attentionOverrideMap"]
+    correctionMap = data["correctionMap"]
+    unk_map = data["unk_map"]
+
+    translation, attn, translations = model.translate(sentence, beam_size,
+                                                              attLayer=attLayer,
                                                               beam_length=beam_length,
                                                               beam_coverage=beam_coverage,
                                                               attention_override_map=attentionOverrideMap,
@@ -417,10 +437,12 @@ def attentionUpdate():
     correctionMap = data["correctionMap"]
     unk_map = data["unk_map"]
     beam_size = int(data["beam_size"])
+    attLayer = None if data["attLayer"] is None else int(data["attLayer"])
     beam_length = float(data["beam_length"])
     beam_coverage = float(data["beam_coverage"])
 
     translation, attn, translations = model.translate(sentence, beam_size,
+                                                              attLayer=attLayer,
                                                               beam_length=beam_length,
                                                               beam_coverage=beam_coverage,
                                                               attention_override_map=attentionOverrideMap,
@@ -441,10 +463,12 @@ def wordUpdate():
     correctionMap = data["correctionMap"]
     unk_map = data["unk_map"]
     beam_size = int(data["beam_size"])
+    attLayer = None if data["attLayer"] is None else int(data["attLayer"])
     beam_length = float(data["beam_length"])
     beam_coverage = float(data["beam_coverage"])
 
     translation, attn, translations = model.translate(sentence, beam_size,
+                                                              attLayer=attLayer,
                                                               beam_length=beam_length,
                                                               beam_coverage=beam_coverage,
                                                               attention_override_map=attentionOverrideMap,
@@ -462,10 +486,11 @@ def translate():
     data = request.get_json()
     sentence = data["sentence"]
     beam_size = int(data["beam_size"])
+    attLayer = None if data["attLayer"] is None else int(data["attLayer"])
     beam_length = float(data["beam_length"])
     beam_coverage = float(data["beam_coverage"])
 
-    translation, attn, translations = model.translate(sentence, beam_size, beam_length=beam_length,
+    translation, attn, translations = model.translate(sentence, beam_size, attLayer=attLayer, beam_length=beam_length,
                                                               beam_coverage=beam_coverage, apply_bpe=False)
 
     res = {}
@@ -496,7 +521,7 @@ def retrain(document_id):
 
     if 'seq' in model_name:
         from seq2seq.train import retrain_iters
-        retrain_iters(model, pairs, [], SRC_LANG, TGT_LANG, batch_size=1, print_every=1, n_epochs=2,
+        retrain_iters(model, pairs, [], SRC_LANG, TGT_LANG, batch_size=1, print_every=1, n_epochs=15,
                     learning_rate=0.0001)
     elif 'trafo' in model_name:
         model.retrain(SRC_LANG, TGT_LANG, pairs, last_ckpt=f'.data/models/transformer/trafo_{SRC_LANG}_{TGT_LANG}_ensemble.pt', epochs=15, batch_size=1, device='cpu')
@@ -521,14 +546,13 @@ def retranslate(document_id):
     return jsonify({"numChanges": num_changes})
 
 
-def retranslateSentenceWithId(i, sentence, scorer, keyphrases, num_changes, beam_size = 3, force = False):
+def retranslateSentenceWithId(i, sentence, scorer, keyphrases, num_changes, beam_size=3, attLayer=-2, force=False):
     print("Retranslate: " + str(i))
 
     if sentence.corrected and not force:
         return sentence, num_changes
 
-    translation, attn, translations = model.translate(sentence.source, beam_size=beam_size)
-
+    translation, attn, translations = model.translate(sentence.source, beam_size=beam_size, attLayer=attLayer)
     beam = translationsToTree(translations)
 
     score = scorer.compute_scores(sentence.source, " ".join(translation), attn, keyphrases, "")
@@ -547,9 +571,10 @@ def retranslateSentenceWithId(i, sentence, scorer, keyphrases, num_changes, beam
     return sentence, num_changes
 
 
-@app.route("/api/documents/<document_id>/sentences/<sentence_id>/beam_size/<beam_size>/translateSentence", methods=['POST'])
+@app.route("/api/documents/<document_id>/sentences/<sentence_id>/beam_size/<beam_size>/att_layer/<att_layer>/translateSentence", methods=['POST'])
 @jwt_required
-def retranslateSentence(document_id, sentence_id, beam_size):
+def retranslateSentence(document_id, sentence_id, beam_size, att_layer):
+
     document = get_document(document_id)
     scorer = Scorer()
     extractor = DomainSpecificExtractor(source_file=document.filepath, src_lang=SRC_LANG, tgt_lang=TGT_LANG,
@@ -559,7 +584,7 @@ def retranslateSentence(document_id, sentence_id, beam_size):
     num_changes = 0
 
     retranslateSentenceWithId(sentence_id, document.sentences[int(sentence_id)], scorer, keyphrases,
-                              num_changes, int(beam_size), True)
+                              num_changes, int(beam_size), int(att_layer), force=True)
     save_document(document, document_id)
 
     return jsonify({})
@@ -584,9 +609,6 @@ def filterForSimilarSentences(document_id, reference_id):
         score["order_id"] = i
 
         sentence.score = score
-
-    for i, sentence in enumerate(document.sentences):
-        print(str(i) + "--" + str(sentence.score["similarityToSelectedSentence"]))
 
     save_document(document, document_id)
 
@@ -723,7 +745,7 @@ if __name__ == '__main__':
         document.nlp = spacy.load('de_core_news_sm')
     elif args.src_lang == 'en':
         document.nlp = spacy.load('en_core_web_sm')
-    document.nlp.add_pipe(document.sentence_division_suppresor, name='sent_fix', before='parser')
+    document.nlp.add_pipe('sentence_division_suppresor', before='parser')
 
     print(len(src_vocab))
     print(len(tgt_vocab))

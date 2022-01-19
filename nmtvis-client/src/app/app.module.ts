@@ -2,6 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule}   from '@angular/forms';
+import {ReactiveFormsModule}   from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -19,6 +20,8 @@ import {MatSliderModule} from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material';
+import {MatSelectModule} from '@angular/material';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatFileUploadModule} from 'angular-material-fileupload';
@@ -73,10 +76,10 @@ const appRoutes: Routes = [
         ParallelCoordinatesComponent, SentenceListItemComponent, IntroComponent
     ],
     imports: [
-        BrowserModule, HttpClientModule, FormsModule, BrowserAnimationsModule, MatSnackBarModule,
-        MatButtonModule, MatToolbarModule, MatInputModule, MatProgressSpinnerModule, MatCheckboxModule,
+        BrowserModule, HttpClientModule, FormsModule, ReactiveFormsModule, BrowserAnimationsModule, MatSnackBarModule,
+        MatButtonModule, MatToolbarModule, MatProgressSpinnerModule, MatCheckboxModule,
         MatIconModule, MatCardModule, MatTableModule, MatSidenavModule, MatListModule, MatDividerModule,
-        MatSliderModule, MatInputModule, MatGridListModule, MatDialogModule, MatFileUploadModule, MatProgressBarModule,
+        MatSliderModule, MatInputModule, MatSelectModule, MatFormFieldModule, MatGridListModule, MatDialogModule, MatFileUploadModule, MatProgressBarModule,
         RouterModule.forRoot(
             appRoutes, // <-- debugging purposes only
         )

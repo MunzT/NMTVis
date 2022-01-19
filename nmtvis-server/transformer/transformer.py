@@ -1,6 +1,7 @@
-import data as d
 import math
-import numpy as np
+from typing import Optional
+
+import data as d
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
@@ -8,11 +9,8 @@ import torch.nn.functional as F
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.metrics.functional import bleu_score
 from torch import Tensor
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchtext.data import BucketIterator, Batch
 from transformer.optimizer import Optimizer
-from typing import Optional
-
 
 
 class PositionalEncoding(nn.Module):
@@ -193,7 +191,6 @@ class TransformerWithAttn(nn.Transformer):
         return text_so_far
 
 
-
 global max_src_in_batch, max_tgt_in_batch
 def batch_size_fn(new, count, sofar):
     "Keep augmenting batch and calculate total number of tokens + padding."
@@ -210,16 +207,17 @@ def batch_size_fn(new, count, sofar):
 
 
 class TranslationDataModule(LightningDataModule):
-    def __init__(self, batch_size, src_lang, tgt_lang) -> None:
+    def __init__(self, batch_size, src_lang, tgt_lang, only_val: bool = False) -> None:
         super().__init__()
         self.batch_size = batch_size
         self.src_lang = src_lang
         self.tgt_lang = tgt_lang
+        self.only_val = only_val
 
 
     def setup(self):
         print("Loading data...")
-        self.train_set, self.val_set, self.test_set = d.load_dataset(src_lang=self.src_lang, tgt_lang=self.tgt_lang)
+        self.train_set, self.val_set, self.test_set = d.load_dataset(src_lang=self.src_lang, tgt_lang=self.tgt_lang, only_val=self.only_val)
         src_vocab, tgt_vocab = d.load_vocab(src_lang=self.src_lang, tgt_lang=self.tgt_lang, train_data=self.train_set, val_data=self.val_set, test_data=self.test_set)
         self.src_pad_key = src_vocab.stoi[d.BLANK_WORD]
         self.tgt_pad_key = tgt_vocab.stoi[d.BLANK_WORD]
@@ -233,18 +231,18 @@ class TranslationDataModule(LightningDataModule):
                               train=True, shuffle=True, repeat=False, sort=False)
 
     def val_dataloader(self):
-        return BucketIterator(self.val_set, 1, sort_within_batch=True, sort=False,
+        return BucketIterator(self.val_set, self.batch_size, sort_within_batch=True, sort=False,
                               train=False, shuffle=False)
 
 
-    def transfer_batch_to_device(self, batch, device):
+    def transfer_batch_to_device(self, batch, device, dataloader_idx):
         if isinstance(batch, Batch):
             for field in batch.fields:
                 batch_field = getattr(batch, field)
-                batch_device = super().transfer_batch_to_device(batch_field, device)
+                batch_device = super().transfer_batch_to_device(batch_field, device, dataloader_idx)
                 setattr(batch, field, batch_device)
         else:
-            batch = super().transfer_batch_to_device(batch, device)
+            batch = super().transfer_batch_to_device(batch, device, dataloader_idx)
         return batch
 
 

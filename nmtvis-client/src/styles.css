@@ -189,6 +189,10 @@ circle:hover {
     pointer-events: none;
 }
 
+#attention-matrix-vis text {
+    pointer-events: none;
+}
+
 .sentence-bar {
     fill: orange;
 }

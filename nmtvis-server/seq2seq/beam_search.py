@@ -1,6 +1,4 @@
-import data
 import data as d
-import math
 import torch
 import torch.nn as nn
 from document import Hypothesis
@@ -39,7 +37,7 @@ class BeamSearch:
 
         prefix = prefix + " " + correction
         raw_words = prefix.split(" ")[1:]
-        bpe_words = [data.bpe.process_line(word) if not word.endswith("@@") else word for word in raw_words]
+        bpe_words = [d.bpe.process_line(word) if not word.endswith("@@") else word for word in raw_words]
         words = [word for bpe_word in bpe_words for word in bpe_word.split(" ")]
         return words
 
@@ -52,7 +50,7 @@ class BeamSearch:
 
         for prefix in prefixes:
             raw_words = self.correction_map.pop(prefix).split(" ")
-            bpe_words = [data.bpe.process_line(word) if not word.endswith("@@") else word for word in raw_words]
+            bpe_words = [d.bpe.process_line(word) if not word.endswith("@@") else word for word in raw_words]
             words = [word for bpe_word in bpe_words for word in bpe_word.split(" ")]
 
             for i in range(len(words)):
@@ -62,7 +60,6 @@ class BeamSearch:
 
     def decode_topk(self, latest_tokens, states, last_attn_vectors, partials):
         """Decode all current hypotheses on the beam, returning len(hypotheses) x beam_size candidates"""
-
         # len(latest_tokens) x self.beam_size)
         topk_ids = [[0 for _ in range(self.beam_size)] for _ in range(len(latest_tokens))]
         topk_log_probs = [[0 for _ in range(self.beam_size)] for _ in range(len(latest_tokens))]
@@ -102,18 +99,18 @@ class BeamSearch:
                 word = self.unk_map[partials[i]]
                 topk_words[i][0] = word
                 print("Replaced UNK token with {}".format(word))
-                if word not in data.tgt_vocab.stoi:
+                if word not in d.TGT.vocab.stoi:
                     is_unk[i] = True
                 else:
-                    idx = data.tgt_vocab.stoi[word]
+                    idx = d.TGT.vocab.stoi[word]
                     decoder_output.data[0][idx] = 1000
             elif self.correction_map and partials[i] in self.correction_map:
                 word = self.correction_map[partials[i]]
                 print("Corrected {} for partial= {}".format(word, partials[i]))
-                if not word in data.tgt_vocab.stoi:
+                if not word in d.TGT.vocab.stoi:
                     topk_words[i][0] = word
                     is_unk[i] = True
-                idx = data.tgt_vocab.stoi[word]
+                idx = d.TGT.vocab.stoi[word]
                 decoder_output.data[0][idx] = 1000
 
             decoder_output = nn.functional.log_softmax(decoder_output, dim=-1)
@@ -124,7 +121,7 @@ class BeamSearch:
 
             topk_ids[i] = topk_i.tolist()
             topk_log_probs[i] = topk_v.tolist()
-            topk_words[i] = [data.tgt_vocab.itos[id] if not topk_words[i][j] else topk_words[i][j] for j, id in
+            topk_words[i] = [d.TGT.vocab.itos[id] if not topk_words[i][j] else topk_words[i][j] for j, id in
                              enumerate(topk_ids[i])]
 
             new_states[i] = tuple(h.clone() for h in decoder_hidden)
@@ -138,7 +135,7 @@ class BeamSearch:
 
 
     def to_partial(self, tokens):
-        return " ".join([data.tgt_vocab.itos[token] for token in tokens])
+        return " ".join([d.TGT.vocab.itos[token] for token in tokens])
 
 
     def init_hypothesis(self):
@@ -149,13 +146,13 @@ class BeamSearch:
             last_attn_vector = last_attn_vector.cuda()
 
         if not self.correction_map:
-            return [Hypothesis([data.TGT.vocab.stoi[data.BOS_WORD]], [data.BOS_WORD], [0.0],
+            return [Hypothesis([d.TGT.vocab.stoi[d.BOS_WORD]], [d.BOS_WORD], [0.0],
                                tuple(h.clone() for h in self.decoder_hidden),
                                last_attn_vector.clone(),
                                start_attn, [[]], [False]) for _ in range(self.beam_size)]
 
         # Assume at most 1 correction prefix at all times
-        prefix = [data.TGT.vocab.stoi[data.BOS_WORD]] + [data.tgt_vocab.stoi[token] for token in self.prefix]
+        prefix = [d.TGT.vocab.stoi[d.BOS_WORD]] + [d.TGT.vocab.stoi[token] for token in self.prefix]
         # We need: hidden state at the end of prefix, last_attn_vector, attention, tokens, candidates
 
         tokens = []
@@ -190,9 +187,9 @@ class BeamSearch:
 
             topk_ids = topk_i.tolist()
             topk_log_probs = topk_v.tolist()
-            candidates.append([data.tgt_vocab.itos[i] for i in topk_ids])
+            candidates.append([d.TGT.vocab.itos[i] for i in topk_ids])
 
-        return [Hypothesis(list(tokens), [data.tgt_vocab.itos[token] for token in tokens], [0.0] * len(tokens),
+        return [Hypothesis(list(tokens), [d.TGT.vocab.itos[token] for token in tokens], [0.0] * len(tokens),
                            tuple(h.clone() for h in decoder_hidden),
                            last_attn_vector.clone(),
                            list(start_attn), candidates, [False] * len(tokens)) for _ in range(self.beam_size)]
@@ -230,7 +227,7 @@ class BeamSearch:
                 h, ns, av, attn = hyps[i], new_states[i], new_attn_vectors[i], attns[i]
 
                 for j in range(self.beam_size):
-                    candidates = [data.tgt_vocab.itos[c] for c in (topk_ids[i][:j] + topk_ids[i][j + 1:])]
+                    candidates = [d.TGT.vocab.itos[c] for c in (topk_ids[i][:j] + topk_ids[i][j + 1:])]
 
                     all_hyps.append(
                         h.extend(topk_ids[i][j], topk_words[i][j], topk_log_probs[i][j], ns, av, attn, candidates,
@@ -239,18 +236,18 @@ class BeamSearch:
             # Filter
             hyps = []
             for h in self._best_hyps(all_hyps)[:self.beam_size]:
-                if h.latest_token == data.TGT.vocab.stoi[data.EOS_WORD]:
+                if h.latest_token == d.TGT.vocab.stoi[d.EOS_WORD]:
                     result.append(h)
                 else:
                     if len(h) == self.max_length:
-                        result.append(h.extend(data.TGT.vocab.stoi[data.EOS_WORD], data.EOS_WORD, 0.0, [], [], [[0.0 for _ in range(len(h.attns[-1]))]], [], False))
+                        result.append(h.extend(d.TGT.vocab.stoi[d.EOS_WORD], d.EOS_WORD, 0.0, [], [], [[0.0 for _ in range(len(h.attns[-1]))]], [], False))
                     else:
                         hyps.append(h)
                 if len(result) == self.beam_size:
                     break
             steps += 1
 
-        print("Beam Search found {} hypotheses for beam_size {}".format(len(result), self.beam_size))
+        #print("Beam Search found {} hypotheses for beam_size {}".format(len(result), self.beam_size))
         res = self._best_hyps(result, normalize=True)
         if res:
             res[0].is_golden = True

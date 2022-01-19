@@ -2,6 +2,8 @@ import math
 import os
 import re
 
+from spacy.language import Language
+
 import data
 from shared import UPLOAD_FOLDER
 
@@ -111,6 +113,7 @@ def _is_wordlike(tok):
     return tok.orth_ and tok.orth_[0].isalpha()
 
 
+@Language.component('sentence_division_suppresor')
 def sentence_division_suppresor(doc):
     """Spacy pipeline component that prohibits sentence segmentation between two tokens that start with a letter.
     Useful for taming overzealous sentence segmentation in German model, possibly others as well."""

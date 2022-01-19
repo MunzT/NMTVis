@@ -44,8 +44,8 @@ export class DocumentService {
         return this.http.post(this.documentsUrl + "/" + document_id + "/translate", {});
     }
 
-    retranslateSentence(document_id: string, sentence_id: string, beam_size: number) {
-        return this.http.post(this.documentsUrl + "/" + document_id + "/sentences/" + sentence_id + "/beam_size/" + beam_size + "/translateSentence", {});
+    retranslateSentence(document_id: string, sentence_id: string, beam_size: number, att_layer: number) {
+        return this.http.post(this.documentsUrl + "/" + document_id + "/sentences/" + sentence_id + "/beam_size/" + beam_size + "/att_layer/" + att_layer + "/translateSentence", {});
     }
 
     saveTranslation(document_id: string) {

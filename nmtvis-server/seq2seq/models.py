@@ -1,4 +1,3 @@
-import data
 import data as d
 import seq2seq.hp as hp
 import shared
@@ -210,14 +209,15 @@ class Seq2SeqModel(TranslationModel):
     def load(cls, src_lang, tgt_lang, epoch):
         import os
         checkpoint_name = os.path.join(shared.SEQ2SEQ_CHECKPOINT_PATH, f'seq2seq_{src_lang}_{tgt_lang}_epoch_{epoch}.pt')
+        print("Checkpoint: " + checkpoint_name)
 
         print("Loading seq2seq model from checkpoint", checkpoint_name)
         if not os.path.isfile(checkpoint_name):
             print("No seq2seq checkpoint found - please train model by calling `train_seq2seq.py`")
             exit()
         checkpoint = torch.load(checkpoint_name, map_location=lambda storage, loc: storage)
-        encoder = LSTMEncoderRNN(len(data.src_vocab), hp.hidden_size, hp.embed_size)
-        decoder = LSTMAttnDecoderRNN(encoder, hp.attention, hp.hidden_size, len(data.tgt_vocab))
+        encoder = LSTMEncoderRNN(len(d.SRC.vocab), hp.hidden_size, hp.embed_size)
+        decoder = LSTMAttnDecoderRNN(encoder, hp.attention, hp.hidden_size, len(d.TGT.vocab))
         if torch.cuda.is_available():
             print("Using GPU")
             encoder = encoder.cuda()
@@ -233,7 +233,7 @@ class Seq2SeqModel(TranslationModel):
 
     @torch.no_grad()
     def best_translation(self, hyps):
-        translation = [data.tgt_vocab.itos[token] for token in hyps[0].tokens] if hyps else [data.BOS_WORD]
+        translation = [d.TGT.vocab.itos[token] for token in hyps[0].tokens] if hyps else [d.BOS_WORD]
         attn = hyps[0].attns if hyps else [0]
 
         return translation[1:], attn[1:]
@@ -251,7 +251,7 @@ class Seq2SeqModel(TranslationModel):
 
     @torch.no_grad()
     def translate(self, sentence, beam_size=3, beam_length=0.6, beam_coverage=0.4, attention_override_map=None,
-                  correction_map=None, unk_map=None, max_length=d.MAX_LEN):
+                  correction_map=None, unk_map=None, max_length=d.MAX_LEN, attLayer=None): # attLayer not used
 
         self.eval()
         hyps = self.beam_search(sentence, beam_size, attention_override_map, correction_map, unk_map,

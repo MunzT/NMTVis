@@ -152,6 +152,10 @@
             <li>The <b>Attention View</b> visualizes how words in the source sentence relate to words in the current
                 translation and vice versa.
             </li>
+        </ul>
+
+      <h3>Graph-Based Attention View</h3>
+        <ul>
             <li>Lines with varying thickness connect source words with translation words.</li>
             <li>The <b>thicker</b> the line, the more <b>important</b> the attached source word was for translating the word in the
                 translation.
@@ -164,6 +168,21 @@
             </li>
             <li>You can also <b>hover</b> over words in the source sentence and translation, which highlights all related words
                 in the respective other language.
+            </li>
+        </ul>
+      <h3>Matrix-Based Attention View</h3>
+        <ul>
+            <li>Cells represent the connection between source words and translation words.</li>
+            <li>The more saturated the color is, the more <b>important</b> the attached source word was for translating
+              the word in the translation.
+            </li>
+            <li>During interaction with the Beam Search View, the Attention View shows attention values up to the
+              current source words to aid in correcting a translation.
+            </li>
+            <li>You can also <b>hover</b> over words in the source sentence and translation, which highlights all related
+              words in the respective other language.
+            </li>
+            <li>You can also <b>hover</b> over cells and related words in both languages are highlighted.
             </li>
         </ul>
     </div>

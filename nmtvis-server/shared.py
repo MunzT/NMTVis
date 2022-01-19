@@ -1,4 +1,5 @@
 import os
+
 from flask_sqlalchemy import SQLAlchemy
 
 # DB
@@ -31,4 +32,3 @@ class TranslationModel:
     def translate(self, sentence, beam_size, beam_length, beam_coverage, attention_override_map,
                   correction_map, unk_map, max_length):
         raise NotImplementedError
-

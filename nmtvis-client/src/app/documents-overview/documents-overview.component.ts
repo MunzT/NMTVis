@@ -19,6 +19,7 @@ export class DocumentsOverviewComponent implements OnInit, AfterViewInit {
     selectedDocument;
     selectedSentence;
     newDocumentName;
+    hideCorrected = false;
     showCorrected = false;
     showFlagged = false;
     retrainText = "Retrain";
@@ -164,6 +165,9 @@ export class DocumentsOverviewComponent implements OnInit, AfterViewInit {
     }
 
     sortSentences(metric: string, sortAscending: boolean) {
+        if (!this.selectedDocument.sentences) {
+          return;
+        }
         this.currentSortMetric = metric;
         this.currentSortAscending = sortAscending;
         this.selectedDocument.sentences = this.selectedDocument.sentences.sort((a, b) => {
@@ -384,7 +388,8 @@ export class DocumentsOverviewComponent implements OnInit, AfterViewInit {
             return false;
         }
         return (sentence.flagged || !this.showFlagged)
-            && this.hasActiveTopic(sentence) && (!this.showCorrected || !sentence.corrected);
+            && this.hasActiveTopic(sentence) && (!this.hideCorrected || !sentence.corrected)
+            && this.hasActiveTopic(sentence) && (!this.showCorrected || sentence.corrected);
     }
 
     get correctedSentences() {
@@ -502,6 +507,10 @@ export class DocumentsOverviewComponent implements OnInit, AfterViewInit {
     }
 
     onShowCorrected() {
+        this.computeTopicOccurrences();
+    }
+
+    onHideCorrected() {
         this.computeTopicOccurrences();
     }
 

@@ -1,5 +1,6 @@
 # For data loading
 import os
+
 from pytorch_lightning.utilities.cloud_io import atomic_save
 from pytorch_lightning.utilities.cloud_io import load as pl_load
 from shared import MODELS_FOLDER
@@ -25,7 +26,6 @@ if __name__ == "__main__":
         for trafo_state in trafo_states:
             mean += trafo_state[key]
         avg_state[key] = mean / len(trafo_states)
-
 
     print('saving...')
     ckpt_path = os.path.join(MODELS_FOLDER, 'transformer', f'trafo_{SRC_LANG}_{TGT_LANG}_{LAST_CKPT}.pt')

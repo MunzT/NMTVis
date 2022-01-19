@@ -44,7 +44,7 @@ export class SentencesVisComponent implements OnInit, OnChanges, AfterViewInit {
             this.updateSentences(sentences.currentValue);
         }
         if (changes.selectedSentence) {
-            if (!changes.selectedSentence.currentValue) {
+            if (!("currentValue" in changes.selectedSentence) || !changes.selectedSentence.currentValue) {
                 return;
             }
             var i = this.sentences.indexOf(changes.selectedSentence.currentValue);

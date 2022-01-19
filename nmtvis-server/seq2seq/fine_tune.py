@@ -1,13 +1,9 @@
-import data
-import matplotlib
 import os
-import pickle
-import random
+
 import shared
 import torch
-from scorer import Scorer
 from seq2seq.data_loader import LanguagePairLoader
-from seq2seq.models import Seq2SeqModel, LSTMAttnDecoderRNN, LSTMEncoderRNN
+from seq2seq.models import Seq2SeqModel
 from seq2seq.train import retrain_iters
 
 

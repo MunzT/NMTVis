@@ -106,8 +106,17 @@ Left: Navigation using arrow keys. Right: Custom correction ("experiments") or a
 ### Attention View
 
 * The **Attention View** visualizes how words in the source sentence relate to words in the current translation and vice versa.
+
+#### Graph-Based Attention View
 * Lines with varying thickness connect source words with translation words.
 * The **thicker** the line, the more **important** the attached source word was for translating the word in the translation.
 * If there is **no line** from a source word to any word in the translation, this might suggest that the word was not properly translated.
 * During interaction with the Beam Search View, the Attention View highlights the relevant source words to aid in correcting a translation.
 * You can also **hover** over words in the source sentence and translation, which highlights all related words in the respective other language.
+
+#### Matrix-Based Attention View
+* Cells represent the connection between source words and translation words.
+* The more saturated the color is, the more **important** the attached source word was for translating the word in the translation.
+* During interaction with the Beam Search View, the Attention View shows attention values up to the current source words to aid in correcting a translation.
+* You can also **hover** over words in the source sentence and translation, which highlights all related words in the respective other language.
+* You can also **hover** over cells and related words in both languages are highlighted.
